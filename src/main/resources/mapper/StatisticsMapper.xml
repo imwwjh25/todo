@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.todo.mapper.StatisticsMapper">
+
+    <!-- 按分类统计 -->
+    <select id="statisticsByCategory" resultType="java.util.Map">
+        SELECT
+            c.id as categoryId,
+            c.name as categoryName,
+            COUNT(t.id) as totalCount,
+            SUM(CASE WHEN t.status = 1 THEN 1 ELSE 0 END) as completedCount,
+            ROUND(SUM(CASE WHEN t.status = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(t.id), 2) as completionRate
+        FROM category c
+        LEFT JOIN todo_item t ON c.id = t.category_id AND t.is_deleted = 0
+        WHERE c.is_deleted = 0
+        GROUP BY c.id, c.name
+        ORDER BY c.sort_order
+    </select>
+
+    <!-- 按优先级统计 -->
+    <select id="statisticsByPriority" resultType="java.util.Map">
+        SELECT
+            priority,
+            CASE priority
+                WHEN 0 THEN '低'
+                WHEN 1 THEN '中'
+                WHEN 2 THEN '高'
+            END as priorityName,
+            COUNT(*) as totalCount,
+            SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as completedCount,
+            ROUND(SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) as completionRate,
+            SUM(CASE WHEN status = 0 AND due_date < NOW() THEN 1 ELSE 0 END) as overdueCount
+        FROM todo_item
+        WHERE is_deleted = 0
+        GROUP BY priority
+        ORDER BY priority DESC
+    </select>
+
+    <!-- 时间趋势统计 -->
+    <select id="statisticsTrend" resultType="java.util.Map">
+        SELECT
+            DATE(created_at) as date,
+            SUM(CASE WHEN action = 'CREATE' THEN 1 ELSE 0 END) as createdCount,
+            SUM(CASE WHEN action = 'COMPLETE' THEN 1 ELSE 0 END) as completedCount
+        FROM (
+            SELECT created_at, 'CREATE' as action
+            FROM todo_item
+            WHERE is_deleted = 0
+            AND DATE(created_at) BETWEEN #{startDate} AND #{endDate}
+            UNION ALL
+            SELECT completed_at as created_at, 'COMPLETE' as action
+            FROM todo_item
+            WHERE is_deleted = 0
+            AND status = 1
+            AND DATE(completed_at) BETWEEN #{startDate} AND #{endDate}
+        ) combined
+        GROUP BY DATE(created_at)
+        ORDER BY DATE(created_at)
+    </select>
+
+    <!-- 平均完成耗时统计 -->
+    <select id="completionTimeStatistics" resultType="java.util.Map">
+        SELECT
+            ROUND(AVG(TIMESTAMPDIFF(HOUR, created_at, completed_at)), 2) as avgHours,
+            ROUND(MIN(TIMESTAMPDIFF(HOUR, created_at, completed_at)), 2) as minHours,
+            ROUND(MAX(TIMESTAMPDIFF(HOUR, created_at, completed_at)), 2) as maxHours,
+            ROUND(AVG(CASE WHEN priority = 0 THEN TIMESTAMPDIFF(HOUR, created_at, completed_at) END), 2) as lowAvgHours,
+            ROUND(AVG(CASE WHEN priority = 1 THEN TIMESTAMPDIFF(HOUR, created_at, completed_at) END), 2) as mediumAvgHours,
+            ROUND(AVG(CASE WHEN priority = 2 THEN TIMESTAMPDIFF(HOUR, created_at, completed_at) END), 2) as highAvgHours
+        FROM todo_item
+        WHERE is_deleted = 0
+        AND status = 1
+        AND completed_at IS NOT NULL
+    </select>
+</mapper>
