@@ -67,7 +67,7 @@ class TodoServiceTest {
                 .build();
 
         when(todoMapper.selectById(1L)).thenReturn(todo);
-        when(todoMapper.updateById(any())).thenReturn(1);
+        when(todoMapper.updateById(any(TodoItem.class))).thenReturn(1);
 
         todoService.completeTodo(1L);
 
