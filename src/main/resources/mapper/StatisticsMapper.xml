@@ -29,7 +29,7 @@
             COUNT(*) as totalCount,
             SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as completedCount,
             ROUND(SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) as completionRate,
-            SUM(CASE WHEN status = 0 AND due_date < NOW() THEN 1 ELSE 0 END) as overdueCount
+            SUM(CASE WHEN status = 0 AND due_date &lt; NOW() THEN 1 ELSE 0 END) as overdueCount
         FROM todo_item
         WHERE is_deleted = 0
         GROUP BY priority

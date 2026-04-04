@@ -21,21 +21,21 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final StatisticsMapper statisticsMapper;
 
     @Override
-    @Cacheable(value = "stats:category")
+    // @Cacheable(value = "stats:category")
     public List<CategoryStatistics> getByCategory() {
         List<Map<String, Object>> results = statisticsMapper.statisticsByCategory();
         return results.stream().map(this::mapToCategoryStats).toList();
     }
 
     @Override
-    @Cacheable(value = "stats:priority")
+    // @Cacheable(value = "stats:priority")
     public List<PriorityStatistics> getByPriority() {
         List<Map<String, Object>> results = statisticsMapper.statisticsByPriority();
         return results.stream().map(this::mapToPriorityStats).toList();
     }
 
     @Override
-    @Cacheable(value = "stats:trend", key = "#period + ':' + #start + ':' + #end")
+    // @Cacheable(value = "stats:trend", key = "#period + ':' + #start + ':' + #end")
     public TrendStatistics getTrend(String period, LocalDate start, LocalDate end) {
         List<Map<String, Object>> results = statisticsMapper.statisticsTrend(period, start, end);
         TrendStatistics stats = new TrendStatistics();
@@ -45,7 +45,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    @Cacheable(value = "stats:completion-time")
+    // @Cacheable(value = "stats:completion-time")
     public CompletionTimeStatistics getCompletionTime() {
         Map<String, Object> result = statisticsMapper.completionTimeStatistics();
         return mapToCompletionTimeStats(result);
@@ -57,7 +57,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         stats.setCategoryName((String) map.get("categoryName"));
         stats.setTotalCount(((Number) map.get("totalCount")).longValue());
         stats.setCompletedCount(((Number) map.get("completedCount")).longValue());
-        stats.setCompletionRate((Double) map.get("completionRate"));
+        stats.setCompletionRate(getDouble(map, "completionRate"));
         return stats;
     }
 
@@ -67,7 +67,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         stats.setPriorityName((String) map.get("priorityName"));
         stats.setTotalCount(((Number) map.get("totalCount")).longValue());
         stats.setCompletedCount(((Number) map.get("completedCount")).longValue());
-        stats.setCompletionRate((Double) map.get("completionRate"));
+        stats.setCompletionRate(getDouble(map, "completionRate"));
         stats.setOverdueCount(((Number) map.get("overdueCount")).longValue());
         return stats;
     }
