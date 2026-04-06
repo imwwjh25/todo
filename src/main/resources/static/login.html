@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoMaster - 登录</title>
+
+    <!-- Apple SF Pro Font Stack (system fonts) -->
+    <style>
+        @font-face {
+            font-family: 'SF Pro Display';
+            src: local('SF Pro Display'), local('SFProDisplay-Regular'), local('-apple-system');
+        }
+    </style>
+
+    <style>
+        /* ==================== Apple Store Design System Variables ==================== */
+        :root {
+            /* Light Mode (默认) */
+            --bg-primary: #F5F5F7;
+            --bg-surface: #FFFFFF;
+            --bg-input: #FAFAFC;
+
+            --text-primary: #1D1D1F;
+            --text-secondary: rgba(0,0,0,0.8);
+            --text-muted: rgba(0,0,0,0.56);
+
+            --accent: #0071E3;
+            --accent-hover: #0077ED;
+
+            --border-input: #D2D2D7;
+            --danger: #FF3B30;
+
+            --radius-sm: 8px;
+            --radius-md: 18px;
+            --radius-button: 12px;
+
+            --shadow-modal: 0 8px 32px rgba(0,0,0,0.12);
+            --focus-ring: 0 0 0 3px rgba(0,113,227,0.25);
+
+            --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-text: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            --font-body: 17px;
+            --font-small: 14px;
+
+            --transition-standard: cubic-bezier(0.4, 0, 0.6, 1);
+            --transition-duration: 0.32s;
+        }
+
+        /* Dark Mode - Apple Store 风格 */
+        [data-theme="dark"] {
+            --bg-primary: #000000;
+            --bg-surface: #1D1D1F;
+            --bg-input: #1C1C1E;
+
+            --text-primary: #F5F5F7;
+            --text-secondary: rgba(255,255,255,0.8);
+            --text-muted: rgba(255,255,255,0.56);
+
+            --accent: #2997FF;
+            --accent-hover: #3A9FFF;
+
+            --border-input: #333336;
+            --danger: #FF3B30;
+
+            --shadow-modal: 0 8px 32px rgba(255,255,255,0.12);
+            --focus-ring: 0 0 0 3px rgba(41,151,255,0.25);
+        }
+
+        /* ==================== Base Styles ==================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            font-size: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-text);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.47;
+            letter-spacing: -0.374px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: background var(--transition-duration) var(--transition-standard), color var(--transition-duration) var(--transition-standard);
+        }
+
+        /* ==================== Login Card - Apple Store 风格 ==================== */
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card {
+            background: var(--bg-surface);
+            border-radius: var(--radius-md);
+            padding: 40px;
+            box-shadow: var(--shadow-modal);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        [data-theme="dark"] .login-card {
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* ==================== Brand Section ==================== */
+        .brand {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .brand-logo {
+            width: 56px;
+            height: 56px;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .brand-title {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.28px;
+            margin-bottom: 8px;
+        }
+
+        .brand-subtitle {
+            font-size: var(--font-small);
+            color: var(--text-muted);
+        }
+
+        /* ==================== Form Styles - Apple Store 风格 ==================== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-small);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            letter-spacing: -0.224px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-input);
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-text);
+            font-size: var(--font-body);
+            outline: none;
+            letter-spacing: -0.374px;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+            box-shadow: var(--focus-ring);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* ==================== Button - Apple Store 风格 ==================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            font-family: var(--font-text);
+            font-size: var(--font-body);
+            font-weight: 500;
+            border: none;
+            border-radius: var(--radius-button);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* ==================== Error Message ==================== */
+        .error-message {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--danger);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-small);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* ==================== Footer Links ==================== */
+        .login-footer {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-input);
+        }
+
+        .login-footer-text {
+            font-size: var(--font-small);
+            color: var(--text-muted);
+        }
+
+        .login-footer-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* ==================== Theme Toggle ==================== */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-input);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: var(--shadow-modal);
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.88;
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            color: var(--text-primary);
+        }
+
+        /* ==================== Responsive ==================== */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 28px;
+            }
+
+            .brand-title {
+                font-size: 24px;
+            }
+        }
+
+        /* ==================== Reduced Motion ==================== */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题">
+        <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <svg id="theme-icon-moon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+    </button>
+
+    <!-- Login Container -->
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Brand Section -->
+            <div class="brand">
+                <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                    <path d="M9 5a2 2 0 002 2h2a2 2 0 002-2"/>
+                    <path d="M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    <path d="M9 14l2 2 4-4"/>
+                </svg>
+                <h1 class="brand-title">TodoMaster</h1>
+                <p class="brand-subtitle">高效管理您的待办事项</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message" class="error-message" role="alert"></div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username" class="form-label">用户名</label>
+                    <input type="text" id="username" name="username" class="form-input" placeholder="请输入用户名" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">密码</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="请输入密码" required autocomplete="current-password">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" id="login-btn" class="btn btn-primary">登录</button>
+                </div>
+            </form>
+
+            <!-- Footer -->
+            <div class="login-footer">
+                <p class="login-footer-text">
+                    还没有账户？<a href="#" class="login-footer-link">联系管理员</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // 初始化主题
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+            updateThemeIcon(theme);
+        }
+
+        // 更新主题图标
+        function updateThemeIcon(theme) {
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            if (theme === 'dark') {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        }
+
+        // 切换主题
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        // 处理登录
+        async function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('error-message');
+            const btn = document.getElementById('login-btn');
+
+            // 基本验证
+            if (!username || !password) {
+                errorEl.textContent = '请输入用户名和密码';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '登录中...';
+            errorEl.classList.remove('show');
+
+            try {
+                const response = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.code === 200) {
+                    localStorage.setItem('auth_token', data.data.token);
+                    localStorage.setItem('user_nickname', data.data.nickname);
+                    window.location.href = 'index.html';
+                } else {
+                    errorEl.textContent = data.message || '登录失败，请重试';
+                    errorEl.classList.add('show');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorEl.textContent = '网络错误，请检查网络连接后重试';
+                errorEl.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '登录';
+            }
+        }
+
+        // 页面加载时初始化主题
+        document.addEventListener('DOMContentLoaded', initTheme);
+
+        // 监听系统主题变化
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                const theme = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                updateThemeIcon(theme);
+            }
+        });
+    </script>
+</body>
+</html>
