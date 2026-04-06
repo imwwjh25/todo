@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TodoMaster - 待办事项管理系统</title>
 
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Apple SF Pro Font Stack (system fonts) -->
+    <!-- SF Pro is loaded via system font stack for best compatibility -->
+    <style>
+        @font-face {
+            font-family: 'SF Pro Display';
+            src: local('SF Pro Display'), local('SFProDisplay-Regular'), local('-apple-system');
+        }
+    </style>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,7 +26,8 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+                        sans: ['"SF Pro Text"', '"SF Pro Icons"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+                        display: ['"SF Pro Display"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
                     }
                 }
             }
@@ -30,74 +35,100 @@
     </script>
 
     <style>
-        /* ==================== Design System Variables ==================== */
+        /* ==================== Apple Store Design System Variables ==================== */
         :root {
             /* Light Mode (默认) */
-            --bg-primary: #f5f5f7;
-            --bg-surface: #ffffff;
-            --bg-surface-1: #ffffff;
-            --bg-surface-2: #f5f5f7;
-            --bg-nav: rgba(255,255,255,0.8);
+            --bg-primary: #F5F5F7;
+            --bg-surface: #FFFFFF;
+            --bg-surface-1: #FFFFFF;
+            --bg-surface-2: #F5F5F7;
+            --bg-nav: rgba(255,255,255,0.72);
             --bg-modal-overlay: rgba(0,0,0,0.3);
-            --bg-input: #fafafc;
+            --bg-input: #FAFAFC;
 
-            --text-primary: #1d1d1f;
+            --text-primary: #1D1D1F;
             --text-secondary: rgba(0,0,0,0.8);
-            --text-muted: rgba(0,0,0,0.48);
-            --text-link: #0071e3;
+            --text-muted: rgba(0,0,0,0.56);
+            --text-link: #0071E3;
 
-            --accent: #0071e3;
+            --accent: #0071E3;
+            --accent-hover: #0077ED;
             --accent-hover-opacity: 0.88;
 
             --border: rgba(0,0,0,0.1);
-            --border-input: #d2d2d7;
+            --border-input: #D2D2D7;
             --border-focus: var(--accent);
 
-            --success: #34c759;
-            --warning: #ff9500;
-            --danger: #ff3b30;
+            --success: #34C759;
+            --warning: #FF9500;
+            --danger: #FF3B30;
 
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-pill: 980px;
+            /* Apple Store 圆角系统 */
+            --radius-sm: 8px;      /* 输入框 */
+            --radius-md: 18px;     /* 大卡片 */
+            --radius-lg: 18px;     /* 大区块 */
+            --radius-button: 12px; /* 按钮 */
+            --radius-pill: 980px;  /* 标签 */
 
-            --shadow-card: rgba(0,0,0,0.08) 0 2px 8px;
-            --shadow-card-hover: rgba(0,0,0,0.12) 0 4px 16px;
+            /* Apple Store 阴影策略 - 默认无阴影 */
+            --shadow-card: none;
+            --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-modal: 0 8px 32px rgba(0,0,0,0.12);
             --focus-ring: 0 0 0 3px rgba(0,113,227,0.25);
 
-            --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            --font-text: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+            /* Apple Store 间距系统 */
+            --space-section: 62px;
+            --space-card: 12px;
+            --space-content: 24px;
+
+            /* 导航栏 */
+            --nav-height: 44px;
+
+            /* Apple Store 字体系统 */
+            --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-text: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            --font-hero: 80px;
+            --font-title: 48px;
+            --font-section: 24px;
+            --font-body: 17px;
+            --font-nav: 12px;
+            --font-small: 14px;
+
+            /* Apple Store 动效 */
+            --transition-standard: cubic-bezier(0.4, 0, 0.6, 1);
+            --transition-duration: 0.32s;
         }
 
-        /* Dark Mode */
+        /* Dark Mode - Apple Store 风格 */
         [data-theme="dark"] {
             --bg-primary: #000000;
-            --bg-surface: #1d1d1f;
-            --bg-surface-1: #272729;
-            --bg-surface-2: #28282a;
-            --bg-surface-3: #2a2a2d;
-            --bg-nav: rgba(0,0,0,0.88);
+            --bg-surface: #1D1D1F;
+            --bg-surface-1: #1D1D1F;
+            --bg-surface-2: #000000;
+            --bg-surface-3: #2A2A2D;
+            --bg-nav: rgba(29,29,31,0.72);
             --bg-modal-overlay: rgba(60,60,67,0.64);
-            --bg-input: #1c1c1e;
+            --bg-input: #1C1C1E;
 
-            --text-primary: #f5f5f7;
+            --text-primary: #F5F5F7;
             --text-secondary: rgba(255,255,255,0.8);
-            --text-muted: rgba(255,255,255,0.48);
-            --text-link: #2997ff;
+            --text-muted: rgba(255,255,255,0.56);
+            --text-link: #2997FF;
 
-            --accent: #2997ff;
+            --accent: #2997FF;
+            --accent-hover: #3A9FFF;
 
             --border: rgba(255,255,255,0.1);
             --border-input: #333336;
             --border-focus: var(--accent);
 
-            --success: #34c759;
-            --warning: #ff9500;
-            --danger: #ff3b30;
+            --success: #34C759;
+            --warning: #FF9500;
+            --danger: #FF3B30;
 
-            --shadow-card: rgba(0,0,0,0.5) 3px 5px 30px 0px;
-            --shadow-card-hover: rgba(0,0,0,0.6) 5px 8px 40px 0px;
+            --shadow-card: none;
+            --shadow-card-hover: 0 4px 12px rgba(255,255,255,0.08);
+            --shadow-modal: 0 8px 32px rgba(255,255,255,0.12);
             --focus-ring: 0 0 0 3px rgba(41,151,255,0.25);
         }
 
@@ -105,7 +136,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         html {
-            font-size: 17px;
+            font-size: var(--font-body);
             -webkit-font-smoothing: antialiased;
         }
 
@@ -116,10 +147,10 @@
             line-height: 1.47;
             letter-spacing: -0.374px;
             min-height: 100vh;
-            transition: background 0.3s, color 0.3s;
+            transition: background var(--transition-duration) var(--transition-standard), color var(--transition-duration) var(--transition-standard);
         }
 
-        /* ==================== Navigation ==================== */
+        /* ==================== Navigation - Apple Store 风格 ==================== */
         .nav {
             position: sticky;
             top: 0;
@@ -127,13 +158,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 32px;
-            height: 48px;
+            padding: 0 48px;
+            height: var(--nav-height);
             background: var(--bg-nav);
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
             border-bottom: 1px solid var(--border);
-            transition: background 0.3s;
+            transition: background var(--transition-duration) var(--transition-standard);
         }
 
         .nav-brand {
@@ -209,20 +240,20 @@
             color: var(--text-primary);
         }
 
-        /* ==================== Buttons ==================== */
+        /* ==================== Buttons - Apple Store 风格 ==================== */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 8px 22px;
+            padding: 8px 16px;
             font-family: var(--font-text);
-            font-size: 17px;
+            font-size: var(--font-small);
             font-weight: 400;
             border: none;
-            border-radius: var(--radius-pill);
+            border-radius: var(--radius-button);
             cursor: pointer;
-            transition: opacity 0.15s;
+            transition: background 0.2s ease;
         }
 
         .btn:hover {
@@ -231,7 +262,12 @@
 
         .btn-primary {
             background: var(--accent);
-            color: #ffffff;
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            opacity: 1;
         }
 
         .btn-secondary {
@@ -241,7 +277,7 @@
         }
 
         .btn-secondary:hover {
-            background: rgba(41,151,255,0.1);
+            background: rgba(0,113,227,0.1);
             opacity: 1;
         }
 
@@ -251,13 +287,13 @@
         }
 
         .btn-sm {
-            padding: 6px 16px;
-            font-size: 14px;
+            padding: 6px 12px;
+            font-size: var(--font-small);
         }
 
         .btn-icon {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             padding: 0;
             border-radius: 50%;
             background: rgba(60,60,67,0.64);
@@ -269,12 +305,14 @@
             opacity: 1;
         }
 
-        /* ==================== Cards ==================== */
+        /* ==================== Cards - Apple Store 风格 ==================== */
         .card {
             background: var(--bg-surface-1);
             border-radius: var(--radius-md);
             padding: 24px;
-            transition: box-shadow 0.3s;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-card);
+            transition: box-shadow var(--transition-duration) var(--transition-standard);
         }
 
         [data-theme="dark"] .card {
@@ -283,11 +321,12 @@
 
         .card-hover:hover {
             box-shadow: var(--shadow-card-hover);
+            transform: scale(1.01);
         }
 
         .card-elevated {
             background: var(--bg-surface-3);
-            box-shadow: var(--shadow-card);
+            box-shadow: none;
         }
 
         /* Stats Card */
@@ -307,7 +346,7 @@
         }
 
         .stat-label {
-            font-size: 14px;
+            font-size: var(--font-small);
             color: var(--text-muted);
             margin-top: 4px;
         }
@@ -318,14 +357,14 @@
             color: var(--accent);
         }
 
-        /* ==================== Forms ==================== */
+        /* ==================== Forms - Apple Store 风格 ==================== */
         .form-group {
             margin-bottom: 20px;
         }
 
         .form-label {
             display: block;
-            font-size: 14px;
+            font-size: var(--font-small);
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 6px;
@@ -342,7 +381,7 @@
             padding: 10px 14px;
             border-radius: var(--radius-sm);
             font-family: var(--font-text);
-            font-size: 17px;
+            font-size: var(--font-body);
             outline: none;
             letter-spacing: -0.374px;
             transition: border-color 0.15s, box-shadow 0.15s;
@@ -364,7 +403,7 @@
             cursor: pointer;
         }
 
-        /* ==================== Task Item ==================== */
+        /* ==================== Task Item - Apple Store 风格 ==================== */
         .task-item {
             display: flex;
             align-items: center;
@@ -373,11 +412,13 @@
             background: var(--bg-surface-1);
             border-radius: var(--radius-md);
             border: 1px solid var(--border);
-            transition: box-shadow 0.3s;
+            box-shadow: none;
+            transition: box-shadow var(--transition-duration) var(--transition-standard), transform var(--transition-duration) var(--transition-standard);
         }
 
         .task-item:hover {
             box-shadow: var(--shadow-card-hover);
+            transform: scale(1.005);
         }
 
         .task-item.completed .task-title {
@@ -385,8 +426,8 @@
         }
 
         .task-checkbox {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             border: 2px solid var(--border-input);
             background: transparent;
@@ -407,9 +448,9 @@
         }
 
         .task-checkbox svg {
-            width: 14px;
-            height: 14px;
-            color: #ffffff;
+            width: 12px;
+            height: 12px;
+            color: #FFFFFF;
         }
 
         .task-content {
@@ -418,14 +459,14 @@
         }
 
         .task-title {
-            font-size: 17px;
+            font-size: var(--font-body);
             font-weight: 500;
             color: var(--text-primary);
             letter-spacing: -0.374px;
         }
 
         .task-description {
-            font-size: 14px;
+            font-size: var(--font-small);
             color: var(--text-muted);
             margin-top: 4px;
         }
@@ -441,14 +482,14 @@
             display: inline-flex;
             align-items: center;
             padding: 4px 10px;
-            font-size: 12px;
+            font-size: var(--font-nav);
             font-weight: 500;
             border-radius: var(--radius-pill);
         }
 
-        .task-priority-high { background: rgba(255,59,48,0.15); color: var(--danger); }
-        .task-priority-medium { background: rgba(255,149,0,0.15); color: var(--warning); }
-        .task-priority-low { background: rgba(52,199,89,0.15); color: var(--success); }
+        .task-priority-high { background: rgba(255,59,48,0.12); color: var(--danger); }
+        .task-priority-medium { background: rgba(255,149,0,0.12); color: var(--warning); }
+        .task-priority-low { background: rgba(52,199,89,0.12); color: var(--success); }
 
         .task-category {
             background: var(--bg-surface-2);
@@ -456,19 +497,19 @@
         }
 
         .task-due {
-            font-size: 12px;
+            font-size: var(--font-nav);
             color: var(--text-muted);
         }
 
         .task-status {
             padding: 4px 12px;
-            font-size: 12px;
+            font-size: var(--font-nav);
             font-weight: 500;
             border-radius: var(--radius-pill);
         }
 
-        .task-status-completed { background: rgba(52,199,89,0.15); color: var(--success); }
-        .task-status-pending { background: rgba(255,149,0,0.15); color: var(--warning); }
+        .task-status-completed { background: rgba(52,199,89,0.12); color: var(--success); }
+        .task-status-pending { background: rgba(255,149,0,0.12); color: var(--warning); }
 
         .task-actions {
             display: flex;
@@ -513,7 +554,7 @@
             font-size: 15px;
         }
 
-        /* ==================== Modal ==================== */
+        /* ==================== Modal - Apple Store 风格 ==================== */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -539,7 +580,7 @@
             width: 100%;
             max-width: 480px;
             margin: 20px;
-            box-shadow: var(--shadow-card);
+            box-shadow: var(--shadow-modal);
         }
 
         .modal-header {
@@ -581,7 +622,7 @@
             margin-top: 24px;
         }
 
-        /* ==================== Pagination ==================== */
+        /* ==================== Pagination - Apple Store 风格 ==================== */
         .pagination {
             display: flex;
             justify-content: center;
@@ -591,7 +632,7 @@
 
         .page-btn {
             padding: 8px 16px;
-            font-size: 14px;
+            font-size: var(--font-small);
             font-weight: 400;
             color: var(--text-secondary);
             background: var(--bg-surface-1);
@@ -608,7 +649,7 @@
 
         .page-btn.active {
             background: var(--accent);
-            color: #ffffff;
+            color: #FFFFFF;
             border-color: var(--accent);
         }
 
@@ -617,10 +658,10 @@
             cursor: not-allowed;
         }
 
-        /* ==================== Section Styles ==================== */
+        /* ==================== Section Styles - Apple Store 风格 ==================== */
         .section-title {
             font-family: var(--font-display);
-            font-size: 28px;
+            font-size: var(--font-section);
             font-weight: 600;
             color: var(--text-primary);
             letter-spacing: -0.28px;
@@ -628,7 +669,7 @@
         }
 
         .section-label {
-            font-size: 12px;
+            font-size: var(--font-nav);
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
@@ -636,7 +677,7 @@
             margin-bottom: 8px;
         }
 
-        /* ==================== Filter Bar ==================== */
+        /* ==================== Filter Bar - Apple Store 风格 ==================== */
         .filter-bar {
             display: flex;
             align-items: center;
@@ -657,38 +698,40 @@
             min-width: 120px;
         }
 
-        /* ==================== Category Card ==================== */
+        /* ==================== Category Card - Apple Store 风格 ==================== */
         .category-card {
             padding: 20px;
             background: var(--bg-surface-1);
             border-radius: var(--radius-md);
             border: 1px solid var(--border);
-            transition: box-shadow 0.3s;
+            box-shadow: none;
+            transition: box-shadow var(--transition-duration) var(--transition-standard), transform var(--transition-duration) var(--transition-standard);
         }
 
         .category-card:hover {
             box-shadow: var(--shadow-card-hover);
+            transform: scale(1.01);
         }
 
         .category-name {
-            font-size: 17px;
+            font-size: var(--font-body);
             font-weight: 600;
             color: var(--text-primary);
         }
 
         .category-desc {
-            font-size: 14px;
+            font-size: var(--font-small);
             color: var(--text-muted);
             margin-top: 4px;
         }
 
         .category-count {
-            font-size: 12px;
+            font-size: var(--font-nav);
             color: var(--text-muted);
             margin-top: 12px;
         }
 
-        /* ==================== Statistics Styles ==================== */
+        /* ==================== Statistics Styles - Apple Store 风格 ==================== */
         .stat-item {
             display: flex;
             justify-content: space-between;
@@ -700,17 +743,17 @@
         }
 
         .stat-item-label {
-            font-size: 14px;
+            font-size: var(--font-small);
             color: var(--text-muted);
         }
 
         .stat-item-value {
-            font-size: 17px;
+            font-size: var(--font-body);
             font-weight: 600;
             color: var(--text-primary);
         }
 
-        /* ==================== Skeleton Loading ==================== */
+        /* ==================== Skeleton Loading - Apple Store 风格 ==================== */
         .skeleton {
             background: var(--bg-surface-2);
             border-radius: var(--radius-sm);
@@ -722,7 +765,7 @@
             50% { opacity: 0.5; }
         }
 
-        /* ==================== Chart Container ==================== */
+        /* ==================== Chart Container - Apple Store 风格 ==================== */
         .chart-container {
             background: var(--bg-surface-1);
             border-radius: var(--radius-md);
@@ -731,7 +774,7 @@
         }
 
         .chart-title {
-            font-size: 17px;
+            font-size: var(--font-body);
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 16px;
@@ -760,7 +803,7 @@
             top: 8px;
         }
 
-        /* ==================== Responsive ==================== */
+        /* ==================== Responsive - Apple Store 风格 ==================== */
         @media (max-width: 768px) {
             .nav {
                 padding: 0 20px;
@@ -849,6 +892,7 @@
         </ul>
 
         <div class="nav-actions">
+            <span id="user-nickname" class="nav-user" style="font-size:14px; color:var(--text-secondary); margin-right:8px"></span>
             <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题">
                 <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="5"/>
@@ -857,6 +901,14 @@
                 <svg id="theme-icon-moon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
                 </svg>
+            </button>
+            <button id="logout-btn" class="btn btn-ghost btn-sm" onclick="handleLogout()" aria-label="退出登录">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                <span>退出</span>
             </button>
             <button class="btn btn-primary btn-sm" onclick="openAddTaskModal()" aria-label="快速添加任务">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -868,12 +920,12 @@
     </nav>
 
     <!-- Main Content -->
-    <main id="main-content" class="main-content" style="max-width:980px; margin:0 auto; padding:32px">
+    <main id="main-content" class="main-content" style="max-width:980px; margin:0 auto; padding:48px">
 
         <!-- Dashboard View -->
         <section id="view-dashboard" class="view-section" role="tabpanel" aria-labelledby="tab-dashboard">
             <!-- Stats Cards -->
-            <div class="stats-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px">
+            <div class="stats-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:48px">
                 <div class="card stat-card card-hover">
                     <div>
                         <p class="stat-label">总任务数</p>
@@ -916,7 +968,7 @@
             </div>
 
             <!-- Recent Tasks -->
-            <div class="chart-container" style="margin-bottom:24px">
+            <div class="chart-container" style="margin-bottom:48px">
                 <h2 class="chart-title">最近任务</h2>
                 <div id="recent-tasks" style="display:flex; flex-direction:column; gap:12px">
                     <div class="skeleton" style="height:48px"></div>
