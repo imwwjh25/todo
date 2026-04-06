@@ -16,3 +16,7 @@ mybatis-plus:
       logic-delete-field: isDeleted
       logic-delete-value: 1
       logic-not-delete-value: 0
+
+jwt:
+  secret: TodoMasterSecretKeyForJwtTokenGenerationMustBeAtLeast256Bits
+  expiration: 86400000  # 24小时（毫秒）
