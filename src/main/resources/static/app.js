@@ -8,6 +8,7 @@ let currentPage = 1;
 let pageSize = 10;
 let totalPages = 0;
 let currentFilters = {};
+let currentUser = null;  // 当前用户信息
 
 // Chart 实例
 let charts = {
@@ -17,6 +18,53 @@ let charts = {
     categoryStats: null,
     priorityStats: null
 };
+
+// ==================== Authentication Functions ====================
+
+/**
+ * 检查登录状态，未登录则跳转到登录页
+ */
+function checkAuth() {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+        window.location.href = 'login.html';
+        return false;
+    }
+    return true;
+}
+
+/**
+ * 初始化用户信息
+ */
+async function initUser() {
+    const nickname = localStorage.getItem('user_nickname');
+    const nicknameEl = document.getElementById('user-nickname');
+    if (nickname && nicknameEl) {
+        nicknameEl.textContent = nickname;
+    }
+
+    // 验证 Token 是否有效
+    try {
+        currentUser = await apiGet('/auth/user');
+        if (nicknameEl) {
+            nicknameEl.textContent = currentUser.nickname || currentUser.username;
+        }
+    } catch (error) {
+        // Token 无效，跳转登录页
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_nickname');
+        window.location.href = 'login.html';
+    }
+}
+
+/**
+ * 退出登录
+ */
+function handleLogout() {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_nickname');
+    window.location.href = 'login.html';
+}
 
 // ==================== Theme Management ====================
 
@@ -142,8 +190,22 @@ function openEditTaskModal(task) {
 // ==================== API Helper Functions ====================
 
 async function apiGet(endpoint) {
-    const response = await fetch(`${API_BASE}${endpoint}`);
+    const token = localStorage.getItem('auth_token');
+    const headers = {};
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE}${endpoint}`, { headers });
     const data = await response.json();
+
+    if (data.code === 401) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_nickname');
+        window.location.href = 'login.html';
+        throw new Error('未登录');
+    }
+
     if (data.code === 200) {
         return data.data;
     }
@@ -151,12 +213,26 @@ async function apiGet(endpoint) {
 }
 
 async function apiPost(endpoint, body) {
+    const token = localStorage.getItem('auth_token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(body)
     });
     const data = await response.json();
+
+    if (data.code === 401) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_nickname');
+        window.location.href = 'login.html';
+        throw new Error('未登录');
+    }
+
     if (data.code === 200) {
         return data.data;
     }
@@ -164,12 +240,26 @@ async function apiPost(endpoint, body) {
 }
 
 async function apiPut(endpoint, body) {
+    const token = localStorage.getItem('auth_token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(body)
     });
     const data = await response.json();
+
+    if (data.code === 401) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_nickname');
+        window.location.href = 'login.html';
+        throw new Error('未登录');
+    }
+
     if (data.code === 200) {
         return data.data;
     }
@@ -177,10 +267,25 @@ async function apiPut(endpoint, body) {
 }
 
 async function apiDelete(endpoint) {
+    const token = localStorage.getItem('auth_token');
+    const headers = {};
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE}${endpoint}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers
     });
     const data = await response.json();
+
+    if (data.code === 401) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_nickname');
+        window.location.href = 'login.html';
+        throw new Error('未登录');
+    }
+
     if (data.code === 200) {
         return data.data;
     }
@@ -978,7 +1083,11 @@ function showError(message) {
 // ==================== Initialization ====================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 检查登录状态
+    if (!checkAuth()) return;
+
     initTheme();
+    initUser();
     loadDashboard();
 });
 
