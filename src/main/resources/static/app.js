@@ -18,6 +18,39 @@ let charts = {
     priorityStats: null
 };
 
+// ==================== Theme Management ====================
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+    document.documentElement.setAttribute('data-theme', theme);
+    updateThemeIcon(theme);
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+
+    if (theme === 'dark') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+    } else {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+    }
+}
+
 // ==================== Tab Navigation ====================
 
 function switchTab(tabName) {
@@ -27,9 +60,8 @@ function switchTab(tabName) {
     });
 
     // Remove active from all tabs
-    document.querySelectorAll('.tab-btn').forEach(tab => {
-        tab.classList.remove('tab-active');
-        tab.classList.add('text-gray-500');
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
         tab.setAttribute('aria-selected', 'false');
     });
 
@@ -42,8 +74,7 @@ function switchTab(tabName) {
     // Activate selected tab
     const tab = document.getElementById(`tab-${tabName}`);
     if (tab) {
-        tab.classList.add('tab-active');
-        tab.classList.remove('text-gray-500');
+        tab.classList.add('active');
         tab.setAttribute('aria-selected', 'true');
     }
 
@@ -70,8 +101,7 @@ function switchTab(tabName) {
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        modal.classList.add('active');
         // Focus first input for accessibility
         const firstInput = modal.querySelector('input:not([type="hidden"]), select');
         if (firstInput) {
@@ -83,13 +113,11 @@ function openModal(modalId) {
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+        modal.classList.remove('active');
     }
 }
 
 function openAddTaskModal() {
-    // Populate category dropdown
     populateCategoryDropdown('task-category');
     openModal('modal-add-task');
 }
@@ -99,10 +127,8 @@ function openAddCategoryModal() {
 }
 
 function openEditTaskModal(task) {
-    // Populate category dropdown
     populateCategoryDropdown('edit-task-category');
 
-    // Fill form with task data
     document.getElementById('edit-task-id').value = task.id;
     document.getElementById('edit-task-title').value = task.title;
     document.getElementById('edit-task-description').value = task.description || '';
@@ -165,7 +191,6 @@ async function apiDelete(endpoint) {
 
 async function loadDashboard() {
     try {
-        // Load statistics
         const [todoStats, priorityStats, todosData, categoriesData] = await Promise.all([
             apiGet('/statistics/by-category'),
             apiGet('/statistics/by-priority'),
@@ -173,28 +198,21 @@ async function loadDashboard() {
             apiGet('/categories')
         ]);
 
-        // Calculate dashboard stats
         const totalTasks = todoStats.reduce((sum, cat) => sum + cat.totalCount, 0);
         const completedTasks = todoStats.reduce((sum, cat) => sum + cat.completedCount, 0);
         const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-        // Update stat cards
         document.getElementById('stat-total').textContent = totalTasks;
         document.getElementById('stat-completed').textContent = completedTasks;
         document.getElementById('stat-rate').textContent = `${completionRate}%`;
         document.getElementById('stat-categories').textContent = categoriesData.length;
 
-        // Render recent tasks - use content field from pagination response
         const recentTasks = todosData.content || [];
         renderRecentTasks(recentTasks);
 
-        // Render priority chart
         renderPriorityChart(priorityStats);
-
-        // Render category chart
         renderCategoryChart(todoStats);
 
-        // Store categories globally
         categories = categoriesData;
 
     } catch (error) {
@@ -206,11 +224,24 @@ async function loadDashboard() {
 function renderRecentTasks(tasks) {
     const container = document.getElementById('recent-tasks');
     if (tasks.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-4">暂无任务</p>';
+        container.innerHTML = '<div class="empty-state">暂无任务</div>';
         return;
     }
 
     container.innerHTML = tasks.map(task => createTaskItem(task, true)).join('');
+}
+
+function getChartColors() {
+    const theme = document.documentElement.getAttribute('data-theme');
+    return {
+        text: theme === 'dark' ? '#f5f5f7' : '#1d1d1f',
+        muted: theme === 'dark' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)',
+        grid: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+        accent: theme === 'dark' ? '#2997ff' : '#0071e3',
+        success: '#34c759',
+        warning: '#ff9500',
+        danger: '#ff3b30'
+    };
 }
 
 function renderPriorityChart(data) {
@@ -221,11 +252,11 @@ function renderPriorityChart(data) {
         charts.priority.destroy();
     }
 
-    // API uses integer: 0=LOW, 1=MEDIUM, 2=HIGH
-    const colors = {
-        2: '#DC2626',  // HIGH - red
-        1: '#F59E0B',  // MEDIUM - yellow
-        0: '#10B981'   // LOW - green
+    const colors = getChartColors();
+    const priorityColors = {
+        2: colors.danger,
+        1: colors.warning,
+        0: colors.success
     };
 
     charts.priority = new Chart(ctx, {
@@ -234,7 +265,7 @@ function renderPriorityChart(data) {
             labels: data.map(d => d.priorityName || getPriorityLabel(d.priority)),
             datasets: [{
                 data: data.map(d => d.totalCount),
-                backgroundColor: data.map(d => colors[d.priority] || '#6B7280'),
+                backgroundColor: data.map(d => priorityColors[d.priority] || '#6B7280'),
                 borderWidth: 0
             }]
         },
@@ -243,9 +274,16 @@ function renderPriorityChart(data) {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        color: colors.text,
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
                 }
-            }
+            },
+            cutout: '60%'
         }
     });
 }
@@ -258,6 +296,8 @@ function renderCategoryChart(data) {
         charts.category.destroy();
     }
 
+    const colors = getChartColors();
+
     charts.category = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -266,12 +306,12 @@ function renderCategoryChart(data) {
                 {
                     label: '已完成',
                     data: data.map(d => d.completedCount),
-                    backgroundColor: '#0D9488'
+                    backgroundColor: colors.success
                 },
                 {
                     label: '待完成',
                     data: data.map(d => d.totalCount - d.completedCount),
-                    backgroundColor: '#14B8A6'
+                    backgroundColor: colors.accent
                 }
             ]
         },
@@ -280,12 +320,27 @@ function renderCategoryChart(data) {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        color: colors.text,
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
                 }
             },
             scales: {
-                x: { stacked: true },
-                y: { stacked: true, beginAtZero: true }
+                x: {
+                    stacked: true,
+                    grid: { display: false },
+                    ticks: { color: colors.text }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    grid: { color: colors.grid },
+                    ticks: { color: colors.text }
+                }
             }
         }
     });
@@ -296,7 +351,7 @@ function renderCategoryChart(data) {
 async function loadTasks() {
     try {
         const params = new URLSearchParams({
-            page: currentPage - 1,  // API uses 0-based page
+            page: currentPage - 1,
             size: pageSize,
             ...currentFilters
         });
@@ -308,7 +363,6 @@ async function loadTasks() {
         renderTasksList(tasks);
         renderPagination();
 
-        // Load categories for filter
         if (categories.length === 0) {
             categories = await apiGet('/categories');
             populateCategoryDropdown('filter-category', true);
@@ -323,7 +377,7 @@ async function loadTasks() {
 function renderTasksList(tasks) {
     const container = document.getElementById('tasks-list');
     if (tasks.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-8">暂无任务</p>';
+        container.innerHTML = '<div class="empty-state">暂无任务</div>';
         return;
     }
 
@@ -331,75 +385,76 @@ function renderTasksList(tasks) {
 }
 
 function createTaskItem(task, isCompact = false) {
-    // API uses integer: status 0=PENDING, 1=COMPLETED; priority 0=LOW, 1=MEDIUM, 2=HIGH
     const isCompleted = task.status === 1;
-    const statusClass = isCompleted ? 'status-completed' : 'status-pending';
+    const statusClass = isCompleted ? 'task-status-completed' : 'task-status-pending';
     const statusText = isCompleted ? '已完成' : '待完成';
-    const priorityClass = `priority-${getPriorityKey(task.priority)}`;
+    const priorityKey = getPriorityKey(task.priority);
+    const priorityClass = `task-priority-${priorityKey}`;
     const priorityText = task.priorityName || getPriorityLabel(task.priority);
 
     const dueDate = task.dueDate ? formatDate(task.dueDate) : '';
+    const taskJson = JSON.stringify(task).replace(/"/g, '&quot;');
 
     if (isCompact) {
         return `
-            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg transition-smooth hover:border-primary">
-                <div class="flex items-center space-x-3">
+            <div class="task-item task-compact ${isCompleted ? 'completed' : ''}">
+                <div style="display:flex; align-items:center; gap:12px; flex:1">
                     <button
                         onclick="toggleComplete(${task.id}, ${task.status})"
-                        class="w-5 h-5 rounded border-2 ${isCompleted ? 'bg-primary border-primary' : 'border-gray-300'} transition-smooth cursor-pointer flex items-center justify-center focus-ring"
+                        class="task-checkbox ${isCompleted ? 'checked' : ''}"
                         aria-label="${isCompleted ? '标记为未完成' : '标记为完成'}"
                     >
-                        ${isCompleted ? '<svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>' : ''}
+                        ${isCompleted ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>' : ''}
                     </button>
-                    <div>
-                        <p class="text-sm font-medium text-text ${isCompleted ? 'opacity-50' : ''}">${task.title}</p>
-                        ${dueDate ? `<p class="text-xs text-gray-400">截止: ${dueDate}</p>` : ''}
+                    <div class="task-content" style="padding-left:0">
+                        <p class="task-title">${task.title}</p>
+                        ${dueDate ? `<p class="task-due">截止: ${dueDate}</p>` : ''}
                     </div>
                 </div>
-                <span class="px-2 py-1 text-xs rounded ${statusClass}">${statusText}</span>
+                <span class="task-status ${statusClass}">${statusText}</span>
             </div>
         `;
     }
 
     return `
-        <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg transition-smooth hover:border-primary">
-            <div class="flex items-center space-x-4 flex-1">
+        <div class="task-item ${isCompleted ? 'completed' : ''}">
+            <div style="display:flex; align-items:center; gap:16px; flex:1">
                 <button
                     onclick="toggleComplete(${task.id}, ${task.status})"
-                    class="w-6 h-6 rounded border-2 ${isCompleted ? 'bg-primary border-primary' : 'border-gray-300'} transition-smooth cursor-pointer flex items-center justify-center focus-ring"
+                    class="task-checkbox ${isCompleted ? 'checked' : ''}"
                     aria-label="${isCompleted ? '标记为未完成' : '标记为完成'}"
                 >
-                    ${isCompleted ? '<svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>' : ''}
+                    ${isCompleted ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>' : ''}
                 </button>
-                <div class="flex-1">
-                    <p class="font-medium text-text ${isCompleted ? 'opacity-50' : ''}">${task.title}</p>
-                    ${task.description ? `<p class="text-sm text-gray-500 mt-1">${task.description}</p>` : ''}
-                    <div class="flex items-center space-x-3 mt-2">
-                        <span class="text-xs ${priorityClass} font-medium">${priorityText}</span>
-                        ${task.categoryName ? `<span class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">${task.categoryName}</span>` : ''}
-                        ${dueDate ? `<span class="text-xs text-gray-400">截止: ${dueDate}</span>` : ''}
+                <div class="task-content">
+                    <p class="task-title">${task.title}</p>
+                    ${task.description ? `<p class="task-description">${task.description}</p>` : ''}
+                    <div class="task-meta">
+                        <span class="task-tag ${priorityClass}">${priorityText}</span>
+                        ${task.categoryName ? `<span class="task-tag task-category">${task.categoryName}</span>` : ''}
+                        ${dueDate ? `<span class="task-due">截止: ${dueDate}</span>` : ''}
                     </div>
                 </div>
             </div>
-            <div class="flex items-center space-x-2">
-                <span class="px-2 py-1 text-xs rounded ${statusClass}">${statusText}</span>
-                <div class="flex space-x-1">
+            <div style="display:flex; align-items:center; gap:12px">
+                <span class="task-status ${statusClass}">${statusText}</span>
+                <div class="task-actions">
                     <button
-                        onclick="openEditTaskModal(${JSON.stringify(task).replace(/"/g, '&quot;')})"
-                        class="p-2 text-gray-400 hover:text-primary transition-smooth cursor-pointer focus-ring"
+                        onclick="openEditTaskModal(${taskJson})"
+                        class="task-action-btn"
                         aria-label="编辑任务"
                     >
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
                             <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
                         </svg>
                     </button>
                     <button
                         onclick="deleteTask(${task.id})"
-                        class="p-2 text-gray-400 hover:text-red-500 transition-smooth cursor-pointer focus-ring"
+                        class="task-action-btn delete"
                         aria-label="删除任务"
                     >
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
                         </svg>
                     </button>
@@ -418,39 +473,25 @@ function renderPagination() {
 
     let html = '';
 
-    // Previous button
     html += `
-        <button
-            onclick="goToPage(${currentPage - 1})"
-            class="px-3 py-1 border border-gray-200 rounded text-sm transition-smooth cursor-pointer ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:border-primary'}"
-            ${currentPage === 1 ? 'disabled' : ''}
-        >
+        <button onclick="goToPage(${currentPage - 1})" class="page-btn ${currentPage === 1 ? '' : ''}" ${currentPage === 1 ? 'disabled' : ''}>
             上一页
         </button>
     `;
 
-    // Page numbers
     const startPage = Math.max(1, currentPage - 2);
     const endPage = Math.min(totalPages, currentPage + 2);
 
     for (let i = startPage; i <= endPage; i++) {
         html += `
-            <button
-                onclick="goToPage(${i})"
-                class="px-3 py-1 border rounded text-sm transition-smooth cursor-pointer ${i === currentPage ? 'bg-primary text-white border-primary' : 'border-gray-200 hover:border-primary'}"
-            >
+            <button onclick="goToPage(${i})" class="page-btn ${i === currentPage ? 'active' : ''}">
                 ${i}
             </button>
         `;
     }
 
-    // Next button
     html += `
-        <button
-            onclick="goToPage(${currentPage + 1})"
-            class="px-3 py-1 border border-gray-200 rounded text-sm transition-smooth cursor-pointer ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:border-primary'}"
-            ${currentPage === totalPages ? 'disabled' : ''}
-        >
+        <button onclick="goToPage(${currentPage + 1})" class="page-btn" ${currentPage === totalPages ? 'disabled' : ''}>
             下一页
         </button>
     `;
@@ -487,9 +528,7 @@ function filterTasks() {
 
 async function toggleComplete(taskId, currentStatus) {
     try {
-        // API uses integer status: 0=PENDING, 1=COMPLETED
         if (currentStatus === 1) {
-            // Need to update task to mark as pending
             const task = await apiGet(`/todo-items/${taskId}`);
             await apiPut(`/todo-items/${taskId}`, {
                 title: task.title,
@@ -497,13 +536,12 @@ async function toggleComplete(taskId, currentStatus) {
                 categoryId: task.categoryId,
                 priority: task.priority,
                 dueDate: task.dueDate,
-                status: 0  // Set to PENDING
+                status: 0
             });
         } else {
             await apiPut(`/todo-items/${taskId}/complete`);
         }
 
-        // Refresh current view
         const currentView = document.querySelector('.view-section:not(.hidden)').id.replace('view-', '');
         switch (currentView) {
             case 'dashboard':
@@ -550,7 +588,6 @@ async function submitAddTask(event) {
         closeModal('modal-add-task');
         form.reset();
 
-        // Refresh current view
         const currentView = document.querySelector('.view-section:not(.hidden)').id.replace('view-', '');
         if (currentView === 'dashboard') {
             loadDashboard();
@@ -602,35 +639,27 @@ async function loadCategories() {
 function renderCategoriesList(categories) {
     const container = document.getElementById('categories-list');
     if (categories.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-8">暂无分类</p>';
+        container.innerHTML = '<div class="empty-state">暂无分类</div>';
         return;
     }
 
     container.innerHTML = categories.map(cat => `
-        <div class="card bg-white p-4 border border-gray-200 rounded-lg transition-smooth hover:border-primary">
-            <div class="flex items-start justify-between">
+        <div class="category-card">
+            <div style="display:flex; justify-content:space-between; align-items:start">
                 <div>
-                    <h3 class="font-medium text-text">${cat.name}</h3>
-                    ${cat.description ? `<p class="text-sm text-gray-500 mt-1">${cat.description}</p>` : ''}
-                    <p class="text-xs text-gray-400 mt-2">任务数: ${cat.taskCount || 0}</p>
+                    <h3 class="category-name">${cat.name}</h3>
+                    ${cat.description ? `<p class="category-desc">${cat.description}</p>` : ''}
+                    <p class="category-count">任务数: ${cat.taskCount || 0}</p>
                 </div>
-                <div class="flex space-x-1">
-                    <button
-                        onclick="editCategory(${cat.id})"
-                        class="p-2 text-gray-400 hover:text-primary transition-smooth cursor-pointer focus-ring"
-                        aria-label="编辑分类"
-                    >
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <div class="task-actions">
+                    <button onclick="editCategory(${cat.id})" class="task-action-btn" aria-label="编辑分类">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
                             <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
                         </svg>
                     </button>
-                    <button
-                        onclick="deleteCategory(${cat.id})"
-                        class="p-2 text-gray-400 hover:text-red-500 transition-smooth cursor-pointer focus-ring"
-                        aria-label="删除分类"
-                    >
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <button onclick="deleteCategory(${cat.id})" class="task-action-btn delete" aria-label="删除分类">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
                         </svg>
                     </button>
@@ -677,7 +706,6 @@ async function editCategory(categoryId) {
     const category = categories.find(c => c.id === categoryId);
     if (!category) return;
 
-    // Simple edit via prompt (can be enhanced to modal)
     const newName = prompt('输入新的分类名称:', category.name);
     if (newName && newName !== category.name) {
         try {
@@ -734,6 +762,7 @@ function renderTrendChart(data) {
         charts.trend.destroy();
     }
 
+    const colors = getChartColors();
     const labels = data.dailyStats?.map(d => formatDate(d.date)) || data.labels || [];
     const createdData = data.dailyStats?.map(d => d.created) || data.created || [];
     const completedData = data.dailyStats?.map(d => d.completed) || data.completed || [];
@@ -746,16 +775,16 @@ function renderTrendChart(data) {
                 {
                     label: '新建任务',
                     data: createdData,
-                    borderColor: '#14B8A6',
-                    backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                    borderColor: colors.accent,
+                    backgroundColor: colors.accent + '20',
                     fill: true,
                     tension: 0.3
                 },
                 {
                     label: '完成任务',
                     data: completedData,
-                    borderColor: '#0D9488',
-                    backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                    borderColor: colors.success,
+                    backgroundColor: colors.success + '20',
                     fill: true,
                     tension: 0.3
                 }
@@ -766,12 +795,24 @@ function renderTrendChart(data) {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        color: colors.text,
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
                 }
             },
             scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: colors.text }
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    grid: { color: colors.grid },
+                    ticks: { color: colors.text }
                 }
             }
         }
@@ -786,16 +827,19 @@ function renderCategoryStatsChart(data) {
         charts.categoryStats.destroy();
     }
 
+    const colors = getChartColors();
+    const palette = [
+        colors.accent, colors.success, colors.warning, colors.danger,
+        '#5e5ce6', '#bf5af2', '#fe3d71', '#30d158'
+    ];
+
     charts.categoryStats = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: data.map(d => d.categoryName || '未分类'),
             datasets: [{
                 data: data.map(d => d.totalCount),
-                backgroundColor: [
-                    '#0D9488', '#14B8A6', '#2DD4BF', '#5EEAD4', '#99F6E4',
-                    '#F97316', '#FB923C', '#FDBA74'
-                ],
+                backgroundColor: palette,
                 borderWidth: 0
             }]
         },
@@ -804,7 +848,13 @@ function renderCategoryStatsChart(data) {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        color: colors.text,
+                        padding: 16,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
                 }
             }
         }
@@ -819,11 +869,11 @@ function renderPriorityStatsChart(data) {
         charts.priorityStats.destroy();
     }
 
-    // API uses integer: 0=LOW, 1=MEDIUM, 2=HIGH
-    const colors = {
-        2: '#DC2626',  // HIGH - red
-        1: '#F59E0B',  // MEDIUM - yellow
-        0: '#10B981'   // LOW - green
+    const colors = getChartColors();
+    const priorityColors = {
+        2: colors.danger,
+        1: colors.warning,
+        0: colors.success
     };
 
     charts.priorityStats = new Chart(ctx, {
@@ -833,21 +883,26 @@ function renderPriorityStatsChart(data) {
             datasets: [{
                 label: '任务数',
                 data: data.map(d => d.totalCount),
-                backgroundColor: data.map(d => colors[d.priority] || '#6B7280'),
-                borderWidth: 0
+                backgroundColor: data.map(d => priorityColors[d.priority] || '#6B7280'),
+                borderWidth: 0,
+                borderRadius: 8
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    display: false
-                }
+                legend: { display: false }
             },
             scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: colors.text }
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    grid: { color: colors.grid },
+                    ticks: { color: colors.text }
                 }
             }
         }
@@ -857,29 +912,21 @@ function renderPriorityStatsChart(data) {
 function renderCompletionTimeStats(data) {
     const container = document.getElementById('completion-time-stats');
     container.innerHTML = `
-        <div class="p-4 border border-gray-200 rounded-lg">
-            <div class="flex justify-between items-center">
-                <span class="text-sm text-gray-500">平均完成时间</span>
-                <span class="font-medium text-text">${data.averageDays || 0} 天</span>
-            </div>
+        <div class="stat-item">
+            <span class="stat-item-label">平均完成时间</span>
+            <span class="stat-item-value">${data.averageDays || 0} 天</span>
         </div>
-        <div class="p-4 border border-gray-200 rounded-lg">
-            <div class="flex justify-between items-center">
-                <span class="text-sm text-gray-500">最快完成时间</span>
-                <span class="font-medium text-primary">${data.minDays || 0} 天</span>
-            </div>
+        <div class="stat-item">
+            <span class="stat-item-label">最快完成时间</span>
+            <span class="stat-item-value" style="color:var(--success)">${data.minDays || 0} 天</span>
         </div>
-        <div class="p-4 border border-gray-200 rounded-lg">
-            <div class="flex justify-between items-center">
-                <span class="text-sm text-gray-500">最长完成时间</span>
-                <span class="font-medium text-cta">${data.maxDays || 0} 天</span>
-            </div>
+        <div class="stat-item">
+            <span class="stat-item-label">最长完成时间</span>
+            <span class="stat-item-value" style="color:var(--warning)">${data.maxDays || 0} 天</span>
         </div>
-        <div class="p-4 border border-gray-200 rounded-lg">
-            <div class="flex justify-between items-center">
-                <span class="text-sm text-gray-500">已完成任务数</span>
-                <span class="font-medium text-text">${data.totalCompleted || 0}</span>
-            </div>
+        <div class="stat-item">
+            <span class="stat-item-label">已完成任务数</span>
+            <span class="stat-item-value">${data.totalCompleted || 0}</span>
         </div>
     `;
 }
@@ -896,17 +943,11 @@ function populateCategoryDropdown(dropdownId, includeEmptyOption = false) {
 }
 
 function getPriorityKey(priority) {
-    // Convert integer priority to string key for CSS classes
-    const keys = {
-        2: 'high',
-        1: 'medium',
-        0: 'low'
-    };
+    const keys = { 2: 'high', 1: 'medium', 0: 'low' };
     return keys[priority] || 'low';
 }
 
 function getPriorityLabel(priority) {
-    // Support both integer (0,1,2) and string (LOW,MEDIUM,HIGH)
     const labels = {
         2: '高优先级',
         1: '中优先级',
@@ -931,23 +972,30 @@ function formatDateISO(date) {
 }
 
 function showError(message) {
-    // Simple error display (can be enhanced)
     alert(message);
 }
 
 // ==================== Initialization ====================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Load dashboard on initial load
+    initTheme();
     loadDashboard();
 });
 
 // Close modal on Escape key
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        document.querySelectorAll('.fixed:not(.hidden)').forEach(modal => {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+        document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+            modal.classList.remove('active');
         });
+    }
+});
+
+// Listen for system theme changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+        const newTheme = e.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        updateThemeIcon(newTheme);
     }
 });

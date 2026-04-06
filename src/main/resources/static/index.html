@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TodoMaster - 待办事项管理系统</title>
 
-    <!-- Google Fonts: Plus Jakarta Sans -->
+    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,15 +21,8 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#0D9488',
-                        secondary: '#14B8A6',
-                        cta: '#F97316',
-                        background: '#F0FDFA',
-                        text: '#134E4A'
-                    },
                     fontFamily: {
-                        jakarta: ['Plus Jakarta Sans', 'sans-serif']
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
                     }
                 }
             }
@@ -37,240 +30,914 @@
     </script>
 
     <style>
+        /* ==================== Design System Variables ==================== */
+        :root {
+            /* Light Mode (默认) */
+            --bg-primary: #f5f5f7;
+            --bg-surface: #ffffff;
+            --bg-surface-1: #ffffff;
+            --bg-surface-2: #f5f5f7;
+            --bg-nav: rgba(255,255,255,0.8);
+            --bg-modal-overlay: rgba(0,0,0,0.3);
+            --bg-input: #fafafc;
+
+            --text-primary: #1d1d1f;
+            --text-secondary: rgba(0,0,0,0.8);
+            --text-muted: rgba(0,0,0,0.48);
+            --text-link: #0071e3;
+
+            --accent: #0071e3;
+            --accent-hover-opacity: 0.88;
+
+            --border: rgba(0,0,0,0.1);
+            --border-input: #d2d2d7;
+            --border-focus: var(--accent);
+
+            --success: #34c759;
+            --warning: #ff9500;
+            --danger: #ff3b30;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-pill: 980px;
+
+            --shadow-card: rgba(0,0,0,0.08) 0 2px 8px;
+            --shadow-card-hover: rgba(0,0,0,0.12) 0 4px 16px;
+            --focus-ring: 0 0 0 3px rgba(0,113,227,0.25);
+
+            --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            --font-text: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+        }
+
+        /* Dark Mode */
+        [data-theme="dark"] {
+            --bg-primary: #000000;
+            --bg-surface: #1d1d1f;
+            --bg-surface-1: #272729;
+            --bg-surface-2: #28282a;
+            --bg-surface-3: #2a2a2d;
+            --bg-nav: rgba(0,0,0,0.88);
+            --bg-modal-overlay: rgba(60,60,67,0.64);
+            --bg-input: #1c1c1e;
+
+            --text-primary: #f5f5f7;
+            --text-secondary: rgba(255,255,255,0.8);
+            --text-muted: rgba(255,255,255,0.48);
+            --text-link: #2997ff;
+
+            --accent: #2997ff;
+
+            --border: rgba(255,255,255,0.1);
+            --border-input: #333336;
+            --border-focus: var(--accent);
+
+            --success: #34c759;
+            --warning: #ff9500;
+            --danger: #ff3b30;
+
+            --shadow-card: rgba(0,0,0,0.5) 3px 5px 30px 0px;
+            --shadow-card-hover: rgba(0,0,0,0.6) 5px 8px 40px 0px;
+            --focus-ring: 0 0 0 3px rgba(41,151,255,0.25);
+        }
+
+        /* ==================== Base Styles ==================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            font-size: 17px;
+            -webkit-font-smoothing: antialiased;
+        }
+
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: var(--font-text);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.47;
+            letter-spacing: -0.374px;
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
         }
 
-        /* Flat Design - 无阴影 */
-        .card {
-            border-radius: 0.5rem;
-            border: 1px solid #E5E7EB;
-        }
-
-        /* Focus states for accessibility */
-        .focus-ring:focus {
-            outline: none;
-            ring: 2px;
-            ring-color: #0D9488;
-            ring-offset: 2px;
-        }
-
-        /* Smooth transitions */
-        .transition-smooth {
-            transition: all 150ms ease;
-        }
-
-        /* Skip link for accessibility */
-        .skip-link {
-            position: absolute;
-            top: -40px;
-            left: 0;
-            background: #0D9488;
-            color: white;
-            padding: 8px 16px;
-            z-index: 100;
-        }
-
-        .skip-link:focus {
+        /* ==================== Navigation ==================== */
+        .nav {
+            position: sticky;
             top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            height: 48px;
+            background: var(--bg-nav);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s;
         }
 
-        /* Loading skeleton */
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.28px;
+        }
+
+        .nav-logo {
+            width: 28px;
+            height: 28px;
+            color: var(--accent);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            list-style: none;
+        }
+
+        .nav-tab {
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            color: var(--text-primary);
+            background: var(--bg-surface-1);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--bg-surface-1);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.88;
+        }
+
+        .theme-toggle svg {
+            width: 18px;
+            height: 18px;
+            color: var(--text-primary);
+        }
+
+        /* ==================== Buttons ==================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 22px;
+            font-family: var(--font-text);
+            font-size: 17px;
+            font-weight: 400;
+            border: none;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .btn:hover {
+            opacity: var(--accent-hover-opacity);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(41,151,255,0.1);
+            opacity: 1;
+        }
+
+        .btn-ghost {
+            background: var(--bg-surface-1);
+            color: var(--text-primary);
+        }
+
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 14px;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            background: rgba(60,60,67,0.64);
+            color: var(--text-muted);
+        }
+
+        .btn-icon:hover {
+            color: var(--text-primary);
+            opacity: 1;
+        }
+
+        /* ==================== Cards ==================== */
+        .card {
+            background: var(--bg-surface-1);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            transition: box-shadow 0.3s;
+        }
+
+        [data-theme="dark"] .card {
+            border: 1px solid var(--border);
+        }
+
+        .card-hover:hover {
+            box-shadow: var(--shadow-card-hover);
+        }
+
+        .card-elevated {
+            background: var(--bg-surface-3);
+            box-shadow: var(--shadow-card);
+        }
+
+        /* Stats Card */
+        .stat-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.28px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            color: var(--accent);
+        }
+
+        /* ==================== Forms ==================== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            letter-spacing: -0.224px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-input);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-text);
+            font-size: 17px;
+            outline: none;
+            letter-spacing: -0.374px;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: var(--focus-ring);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        /* ==================== Task Item ==================== */
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--bg-surface-1);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            transition: box-shadow 0.3s;
+        }
+
+        .task-item:hover {
+            box-shadow: var(--shadow-card-hover);
+        }
+
+        .task-item.completed .task-title {
+            opacity: 0.5;
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--border-input);
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .task-checkbox:hover {
+            border-color: var(--accent);
+        }
+
+        .task-checkbox.checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .task-checkbox svg {
+            width: 14px;
+            height: 14px;
+            color: #ffffff;
+        }
+
+        .task-content {
+            flex: 1;
+            padding-left: 16px;
+        }
+
+        .task-title {
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: -0.374px;
+        }
+
+        .task-description {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .task-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: var(--radius-pill);
+        }
+
+        .task-priority-high { background: rgba(255,59,48,0.15); color: var(--danger); }
+        .task-priority-medium { background: rgba(255,149,0,0.15); color: var(--warning); }
+        .task-priority-low { background: rgba(52,199,89,0.15); color: var(--success); }
+
+        .task-category {
+            background: var(--bg-surface-2);
+            color: var(--text-secondary);
+        }
+
+        .task-due {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .task-status {
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: var(--radius-pill);
+        }
+
+        .task-status-completed { background: rgba(52,199,89,0.15); color: var(--success); }
+        .task-status-pending { background: rgba(255,149,0,0.15); color: var(--warning); }
+
+        .task-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .task-action-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.15s;
+        }
+
+        .task-action-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-surface-2);
+        }
+
+        .task-action-btn.delete:hover {
+            color: var(--danger);
+        }
+
+        /* Compact Task */
+        .task-compact {
+            padding: 12px 16px;
+        }
+
+        .task-compact .task-checkbox {
+            width: 20px;
+            height: 20px;
+        }
+
+        .task-compact .task-title {
+            font-size: 15px;
+        }
+
+        /* ==================== Modal ==================== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-modal-overlay);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-surface);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            width: 100%;
+            max-width: 480px;
+            margin: 20px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 21px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.15s;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+            background: var(--bg-surface-2);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* ==================== Pagination ==================== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .page-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            background: var(--bg-surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--bg-surface-2);
+            border-color: var(--accent);
+        }
+
+        .page-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ==================== Section Styles ==================== */
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.28px;
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        /* ==================== Filter Bar ==================== */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--bg-surface-1);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .filter-search {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-select {
+            min-width: 120px;
+        }
+
+        /* ==================== Category Card ==================== */
+        .category-card {
+            padding: 20px;
+            background: var(--bg-surface-1);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            transition: box-shadow 0.3s;
+        }
+
+        .category-card:hover {
+            box-shadow: var(--shadow-card-hover);
+        }
+
+        .category-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .category-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .category-count {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+
+        /* ==================== Statistics Styles ==================== */
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--bg-surface-1);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        .stat-item-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .stat-item-value {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ==================== Skeleton Loading ==================== */
         .skeleton {
+            background: var(--bg-surface-2);
+            border-radius: var(--radius-sm);
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
+            50% { opacity: 0.5; }
         }
 
-        /* Reduced motion */
+        /* ==================== Chart Container ==================== */
+        .chart-container {
+            background: var(--bg-surface-1);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .chart-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        /* ==================== Empty State ==================== */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        /* ==================== Skip Link ==================== */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent);
+            color: #ffffff;
+            padding: 8px 16px;
+            z-index: 300;
+            border-radius: var(--radius-sm);
+        }
+
+        .skip-link:focus {
+            top: 8px;
+        }
+
+        /* ==================== Responsive ==================== */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 0 20px;
+            }
+
+            .nav-tabs {
+                display: none;
+            }
+
+            .main-content {
+                padding: 16px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filter-bar {
+                flex-wrap: wrap;
+            }
+
+            .filter-search {
+                min-width: 100%;
+                order: -1;
+            }
+
+            .modal-content {
+                margin: 16px;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ==================== Reduced Motion ==================== */
         @media (prefers-reduced-motion: reduce) {
-            .transition-smooth {
-                transition: none;
+            * {
+                transition: none !important;
+                animation: none !important;
             }
-            .skeleton {
-                animation: none;
-            }
-        }
-
-        /* Tab indicator */
-        .tab-active {
-            color: #0D9488;
-            border-bottom: 2px solid #0D9488;
-        }
-
-        /* Priority colors */
-        .priority-high { color: #DC2626; }
-        .priority-medium { color: #F59E0B; }
-        .priority-low { color: #10B981; }
-
-        /* Status badge */
-        .status-completed {
-            background-color: #D1FAE5;
-            color: #065F46;
-        }
-
-        .status-pending {
-            background-color: #FEF3C7;
-            color: #92400E;
         }
     </style>
 </head>
-<body class="bg-background min-h-screen font-jakarta">
+<body>
     <!-- Skip Link for Accessibility -->
     <a href="#main-content" class="skip-link">跳到主要内容</a>
 
     <!-- Navigation Bar -->
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
-                <!-- Logo -->
-                <div class="flex items-center space-x-3">
-                    <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                    </svg>
-                    <span class="text-xl font-semibold text-text">TodoMaster</span>
-                </div>
+    <nav class="nav">
+        <div class="nav-brand">
+            <svg class="nav-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
+            <span>TodoMaster</span>
+        </div>
 
-                <!-- Navigation Tabs -->
-                <div class="flex space-x-1" role="tablist">
-                    <button
-                        id="tab-dashboard"
-                        class="tab-btn px-4 py-2 text-sm font-medium transition-smooth cursor-pointer tab-active"
-                        role="tab"
-                        aria-selected="true"
-                        onclick="switchTab('dashboard')"
-                    >
-                        仪表板
-                    </button>
-                    <button
-                        id="tab-tasks"
-                        class="tab-btn px-4 py-2 text-sm font-medium text-gray-500 transition-smooth cursor-pointer"
-                        role="tab"
-                        aria-selected="false"
-                        onclick="switchTab('tasks')"
-                    >
-                        任务列表
-                    </button>
-                    <button
-                        id="tab-categories"
-                        class="tab-btn px-4 py-2 text-sm font-medium text-gray-500 transition-smooth cursor-pointer"
-                        role="tab"
-                        aria-selected="false"
-                        onclick="switchTab('categories')"
-                    >
-                        分类管理
-                    </button>
-                    <button
-                        id="tab-statistics"
-                        class="tab-btn px-4 py-2 text-sm font-medium text-gray-500 transition-smooth cursor-pointer"
-                        role="tab"
-                        aria-selected="false"
-                        onclick="switchTab('statistics')"
-                    >
-                        统计分析
-                    </button>
-                </div>
-
-                <!-- Quick Add Button -->
-                <button
-                    onclick="openAddTaskModal()"
-                    class="px-4 py-2 bg-cta text-white text-sm font-medium rounded-lg transition-smooth hover:bg-orange-600 cursor-pointer focus-ring"
-                    aria-label="快速添加任务"
-                >
-                    <span class="flex items-center space-x-2">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 5v14M5 12h14"/>
-                        </svg>
-                        <span>添加任务</span>
-                    </span>
+        <ul class="nav-tabs" role="tablist">
+            <li>
+                <button id="tab-dashboard" class="nav-tab active" role="tab" aria-selected="true" onclick="switchTab('dashboard')">
+                    仪表板
                 </button>
-            </div>
+            </li>
+            <li>
+                <button id="tab-tasks" class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('tasks')">
+                    任务列表
+                </button>
+            </li>
+            <li>
+                <button id="tab-categories" class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('categories')">
+                    分类管理
+                </button>
+            </li>
+            <li>
+                <button id="tab-statistics" class="nav-tab" role="tab" aria-selected="false" onclick="switchTab('statistics')">
+                    统计分析
+                </button>
+            </li>
+        </ul>
+
+        <div class="nav-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题">
+                <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+                <svg id="theme-icon-moon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                </svg>
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="openAddTaskModal()" aria-label="快速添加任务">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                <span>添加任务</span>
+            </button>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main id="main-content" class="max-w-6xl mx-auto px-4 py-6">
+    <main id="main-content" class="main-content" style="max-width:980px; margin:0 auto; padding:32px">
 
         <!-- Dashboard View -->
         <section id="view-dashboard" class="view-section" role="tabpanel" aria-labelledby="tab-dashboard">
             <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <!-- Total Tasks -->
-                <div class="card bg-white p-6 transition-smooth hover:border-primary cursor-default">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500">总任务数</p>
-                            <p id="stat-total" class="text-2xl font-semibold text-text">-</p>
-                        </div>
-                        <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                        </svg>
+            <div class="stats-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px">
+                <div class="card stat-card card-hover">
+                    <div>
+                        <p class="stat-label">总任务数</p>
+                        <p id="stat-total" class="stat-value">-</p>
                     </div>
+                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                    </svg>
                 </div>
 
-                <!-- Completed -->
-                <div class="card bg-white p-6 transition-smooth hover:border-primary cursor-default">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500">已完成</p>
-                            <p id="stat-completed" class="text-2xl font-semibold text-primary">-</p>
-                        </div>
-                        <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                <div class="card stat-card card-hover">
+                    <div>
+                        <p class="stat-label">已完成</p>
+                        <p id="stat-completed" class="stat-value" style="color:var(--success)">-</p>
                     </div>
+                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
                 </div>
 
-                <!-- Completion Rate -->
-                <div class="card bg-white p-6 transition-smooth hover:border-primary cursor-default">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500">完成率</p>
-                            <p id="stat-rate" class="text-2xl font-semibold text-cta">-</p>
-                        </div>
-                        <svg class="w-8 h-8 text-cta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
+                <div class="card stat-card card-hover">
+                    <div>
+                        <p class="stat-label">完成率</p>
+                        <p id="stat-rate" class="stat-value" style="color:var(--accent)">-</p>
                     </div>
+                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
                 </div>
 
-                <!-- Categories -->
-                <div class="card bg-white p-6 transition-smooth hover:border-primary cursor-default">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500">分类数</p>
-                            <p id="stat-categories" class="text-2xl font-semibold text-text">-</p>
-                        </div>
-                        <svg class="w-8 h-8 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
-                        </svg>
+                <div class="card stat-card card-hover">
+                    <div>
+                        <p class="stat-label">分类数</p>
+                        <p id="stat-categories" class="stat-value">-</p>
                     </div>
+                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
                 </div>
             </div>
 
             <!-- Recent Tasks -->
-            <div class="card bg-white p-6">
-                <h2 class="text-lg font-semibold text-text mb-4">最近任务</h2>
-                <div id="recent-tasks" class="space-y-3">
-                    <!-- Tasks will be loaded here -->
-                    <div class="skeleton h-12 bg-gray-100 rounded"></div>
-                    <div class="skeleton h-12 bg-gray-100 rounded"></div>
-                    <div class="skeleton h-12 bg-gray-100 rounded"></div>
+            <div class="chart-container" style="margin-bottom:24px">
+                <h2 class="chart-title">最近任务</h2>
+                <div id="recent-tasks" style="display:flex; flex-direction:column; gap:12px">
+                    <div class="skeleton" style="height:48px"></div>
+                    <div class="skeleton" style="height:48px"></div>
+                    <div class="skeleton" style="height:48px"></div>
                 </div>
             </div>
 
-            <!-- Quick Stats Chart -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                <div class="card bg-white p-6">
-                    <h2 class="text-lg font-semibold text-text mb-4">优先级分布</h2>
-                    <canvas id="chart-priority" height="200"></canvas>
+            <!-- Charts -->
+            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:16px">
+                <div class="chart-container">
+                    <h2 class="chart-title">优先级分布</h2>
+                    <div style="height:200px">
+                        <canvas id="chart-priority"></canvas>
+                    </div>
                 </div>
-                <div class="card bg-white p-6">
-                    <h2 class="text-lg font-semibold text-text mb-4">分类分布</h2>
-                    <canvas id="chart-category" height="200"></canvas>
+                <div class="chart-container">
+                    <h2 class="chart-title">分类分布</h2>
+                    <div style="height:200px">
+                        <canvas id="chart-category"></canvas>
+                    </div>
                 </div>
             </div>
         </section>
@@ -278,397 +945,211 @@
         <!-- Tasks View -->
         <section id="view-tasks" class="view-section hidden" role="tabpanel" aria-labelledby="tab-tasks">
             <!-- Filters -->
-            <div class="card bg-white p-4 mb-4">
-                <div class="flex flex-wrap gap-4 items-center">
-                    <!-- Search -->
-                    <div class="flex-1 min-w-64">
-                        <input
-                            type="text"
-                            id="search-input"
-                            placeholder="搜索任务..."
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth focus:border-primary focus:outline-none"
-                            onkeyup="searchTasks()"
-                        >
-                    </div>
-
-                    <!-- Category Filter -->
-                    <select
-                        id="filter-category"
-                        class="px-4 py-2 border border-gray-200 rounded-lg transition-smooth cursor-pointer focus:border-primary focus:outline-none"
-                        onchange="filterTasks()"
-                    >
-                        <option value="">所有分类</option>
-                    </select>
-
-                    <!-- Priority Filter -->
-                    <select
-                        id="filter-priority"
-                        class="px-4 py-2 border border-gray-200 rounded-lg transition-smooth cursor-pointer focus:border-primary focus:outline-none"
-                        onchange="filterTasks()"
-                    >
-                        <option value="">所有优先级</option>
-                        <option value="2">高优先级</option>
-                        <option value="1">中优先级</option>
-                        <option value="0">低优先级</option>
-                    </select>
-
-                    <!-- Status Filter -->
-                    <select
-                        id="filter-status"
-                        class="px-4 py-2 border border-gray-200 rounded-lg transition-smooth cursor-pointer focus:border-primary focus:outline-none"
-                        onchange="filterTasks()"
-                    >
-                        <option value="">所有状态</option>
-                        <option value="0">待完成</option>
-                        <option value="1">已完成</option>
-                    </select>
+            <div class="filter-bar">
+                <div class="filter-search">
+                    <input type="text" id="search-input" class="form-input" placeholder="搜索任务..." onkeyup="searchTasks()">
                 </div>
+                <select id="filter-category" class="form-select filter-select" onchange="filterTasks()">
+                    <option value="">所有分类</option>
+                </select>
+                <select id="filter-priority" class="form-select filter-select" onchange="filterTasks()">
+                    <option value="">所有优先级</option>
+                    <option value="2">高优先级</option>
+                    <option value="1">中优先级</option>
+                    <option value="0">低优先级</option>
+                </select>
+                <select id="filter-status" class="form-select filter-select" onchange="filterTasks()">
+                    <option value="">所有状态</option>
+                    <option value="0">待完成</option>
+                    <option value="1">已完成</option>
+                </select>
             </div>
 
             <!-- Tasks List -->
-            <div class="card bg-white p-6">
-                <div id="tasks-list" class="space-y-3">
-                    <!-- Tasks will be loaded here -->
-                    <div class="skeleton h-16 bg-gray-100 rounded"></div>
-                    <div class="skeleton h-16 bg-gray-100 rounded"></div>
-                    <div class="skeleton h-16 bg-gray-100 rounded"></div>
+            <div class="chart-container">
+                <div id="tasks-list" style="display:flex; flex-direction:column; gap:12px">
+                    <div class="skeleton" style="height:64px"></div>
+                    <div class="skeleton" style="height:64px"></div>
+                    <div class="skeleton" style="height:64px"></div>
                 </div>
-
-                <!-- Pagination -->
-                <div id="pagination" class="flex justify-center mt-6 space-x-2">
-                    <!-- Pagination buttons will be generated -->
-                </div>
+                <div id="pagination" class="pagination"></div>
             </div>
         </section>
 
         <!-- Categories View -->
         <section id="view-categories" class="view-section hidden" role="tabpanel" aria-labelledby="tab-categories">
-            <!-- Add Category Button -->
-            <div class="mb-4">
-                <button
-                    onclick="openAddCategoryModal()"
-                    class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg transition-smooth hover:bg-secondary cursor-pointer focus-ring"
-                >
-                    <span class="flex items-center space-x-2">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 5v14M5 12h14"/>
-                        </svg>
-                        <span>新建分类</span>
-                    </span>
+            <div style="margin-bottom:16px">
+                <button class="btn btn-secondary btn-sm" onclick="openAddCategoryModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    <span>新建分类</span>
                 </button>
             </div>
 
-            <!-- Categories List -->
-            <div class="card bg-white p-6">
-                <div id="categories-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Categories will be loaded here -->
-                    <div class="skeleton h-24 bg-gray-100 rounded"></div>
-                    <div class="skeleton h-24 bg-gray-100 rounded"></div>
-                    <div class="skeleton h-24 bg-gray-100 rounded"></div>
-                </div>
+            <div id="categories-list" class="categories-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px">
+                <div class="skeleton" style="height:96px"></div>
+                <div class="skeleton" style="height:96px"></div>
+                <div class="skeleton" style="height:96px"></div>
             </div>
         </section>
 
         <!-- Statistics View -->
         <section id="view-statistics" class="view-section hidden" role="tabpanel" aria-labelledby="tab-statistics">
-            <!-- Date Range Picker -->
-            <div class="card bg-white p-4 mb-4">
-                <div class="flex items-center space-x-4">
-                    <label class="text-sm font-medium text-text">日期范围:</label>
-                    <input
-                        type="date"
-                        id="date-start"
-                        class="px-4 py-2 border border-gray-200 rounded-lg transition-smooth focus:border-primary focus:outline-none"
-                    >
-                    <input
-                        type="date"
-                        id="date-end"
-                        class="px-4 py-2 border border-gray-200 rounded-lg transition-smooth focus:border-primary focus:outline-none"
-                    >
-                    <button
-                        onclick="loadStatistics()"
-                        class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg transition-smooth hover:bg-secondary cursor-pointer focus-ring"
-                    >
-                        查询
-                    </button>
-                </div>
+            <div class="filter-bar">
+                <label style="font-size:14px; font-weight:500; color:var(--text-primary)">日期范围:</label>
+                <input type="date" id="date-start" class="form-input" style="max-width:160px">
+                <input type="date" id="date-end" class="form-input" style="max-width:160px">
+                <button class="btn btn-primary btn-sm" onclick="loadStatistics()">查询</button>
             </div>
 
-            <!-- Charts -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Trend Chart -->
-                <div class="card bg-white p-6">
-                    <h2 class="text-lg font-semibold text-text mb-4">任务趋势</h2>
-                    <canvas id="chart-trend" height="300"></canvas>
-                </div>
-
-                <!-- Completion Time -->
-                <div class="card bg-white p-6">
-                    <h2 class="text-lg font-semibold text-text mb-4">完成时间统计</h2>
-                    <div id="completion-time-stats" class="space-y-4">
-                        <!-- Stats will be loaded here -->
+            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:16px">
+                <div class="chart-container">
+                    <h2 class="chart-title">任务趋势</h2>
+                    <div style="height:300px">
+                        <canvas id="chart-trend"></canvas>
                     </div>
                 </div>
 
-                <!-- Category Stats -->
-                <div class="card bg-white p-6">
-                    <h2 class="text-lg font-semibold text-text mb-4">分类统计</h2>
-                    <canvas id="chart-category-stats" height="250"></canvas>
+                <div class="chart-container">
+                    <h2 class="chart-title">完成时间统计</h2>
+                    <div id="completion-time-stats" style="display:flex; flex-direction:column; gap:12px">
+                    </div>
                 </div>
 
-                <!-- Priority Stats -->
-                <div class="card bg-white p-6">
-                    <h2 class="text-lg font-semibold text-text mb-4">优先级统计</h2>
-                    <canvas id="chart-priority-stats" height="250"></canvas>
+                <div class="chart-container">
+                    <h2 class="chart-title">分类统计</h2>
+                    <div style="height:250px">
+                        <canvas id="chart-category-stats"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h2 class="chart-title">优先级统计</h2>
+                    <div style="height:250px">
+                        <canvas id="chart-priority-stats"></canvas>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- Add Task Modal -->
-    <div id="modal-add-task" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" role="dialog" aria-modal="true">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-text">添加任务</h2>
-                <button onclick="closeModal('modal-add-task')" class="text-gray-400 hover:text-gray-600 cursor-pointer">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 18L18 6M6 6l12 12"/>
+    <div id="modal-add-task" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">添加任务</h2>
+                <button class="modal-close" onclick="closeModal('modal-add-task')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
-
             <form id="form-add-task" onsubmit="submitAddTask(event)">
-                <div class="space-y-4">
-                    <!-- Title -->
-                    <div>
-                        <label for="task-title" class="block text-sm font-medium text-text mb-1">任务标题 *</label>
-                        <input
-                            type="text"
-                            id="task-title"
-                            name="title"
-                            required
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth focus:border-primary focus:outline-none"
-                        >
-                    </div>
-
-                    <!-- Description -->
-                    <div>
-                        <label for="task-description" class="block text-sm font-medium text-text mb-1">任务描述</label>
-                        <textarea
-                            id="task-description"
-                            name="description"
-                            rows="3"
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth focus:border-primary focus:outline-none resize-none"
-                        ></textarea>
-                    </div>
-
-                    <!-- Category -->
-                    <div>
-                        <label for="task-category" class="block text-sm font-medium text-text mb-1">分类</label>
-                        <select
-                            id="task-category"
-                            name="categoryId"
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth cursor-pointer focus:border-primary focus:outline-none"
-                        >
-                            <option value="">选择分类</option>
-                        </select>
-                    </div>
-
-                    <!-- Priority -->
-                    <div>
-                        <label for="task-priority" class="block text-sm font-medium text-text mb-1">优先级</label>
-                        <select
-                            id="task-priority"
-                            name="priority"
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth cursor-pointer focus:border-primary focus:outline-none"
-                        >
-                            <option value="0">低</option>
-                            <option value="1">中</option>
-                            <option value="2">高</option>
-                        </select>
-                    </div>
-
-                    <!-- Due Date -->
-                    <div>
-                        <label for="task-due-date" class="block text-sm font-medium text-text mb-1">截止日期</label>
-                        <input
-                            type="date"
-                            id="task-due-date"
-                            name="dueDate"
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth focus:border-primary focus:outline-none"
-                        >
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button
-                            type="button"
-                            onclick="closeModal('modal-add-task')"
-                            class="px-4 py-2 text-gray-600 text-sm font-medium transition-smooth hover:text-gray-800 cursor-pointer"
-                        >
-                            取消
-                        </button>
-                        <button
-                            type="submit"
-                            class="px-4 py-2 bg-cta text-white text-sm font-medium rounded-lg transition-smooth hover:bg-orange-600 cursor-pointer focus-ring"
-                        >
-                            创建任务
-                        </button>
-                    </div>
+                <div class="form-group">
+                    <label for="task-title" class="form-label">任务标题 *</label>
+                    <input type="text" id="task-title" name="title" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description" class="form-label">任务描述</label>
+                    <textarea id="task-description" name="description" class="form-textarea" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-category" class="form-label">分类</label>
+                    <select id="task-category" name="categoryId" class="form-select">
+                        <option value="">选择分类</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority" class="form-label">优先级</label>
+                    <select id="task-priority" name="priority" class="form-select">
+                        <option value="0">低</option>
+                        <option value="1">中</option>
+                        <option value="2">高</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-due-date" class="form-label">截止日期</label>
+                    <input type="date" id="task-due-date" name="dueDate" class="form-input">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-add-task')">取消</button>
+                    <button type="submit" class="btn btn-primary btn-sm">创建任务</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Add Category Modal -->
-    <div id="modal-add-category" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" role="dialog" aria-modal="true">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-text">新建分类</h2>
-                <button onclick="closeModal('modal-add-category')" class="text-gray-400 hover:text-gray-600 cursor-pointer">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 18L18 6M6 6l12 12"/>
+    <div id="modal-add-category" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">新建分类</h2>
+                <button class="modal-close" onclick="closeModal('modal-add-category')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
-
             <form id="form-add-category" onsubmit="submitAddCategory(event)">
-                <div class="space-y-4">
-                    <!-- Name -->
-                    <div>
-                        <label for="category-name" class="block text-sm font-medium text-text mb-1">分类名称 *</label>
-                        <input
-                            type="text"
-                            id="category-name"
-                            name="name"
-                            required
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth focus:border-primary focus:outline-none"
-                        >
-                    </div>
-
-                    <!-- Description -->
-                    <div>
-                        <label for="category-description" class="block text-sm font-medium text-text mb-1">分类描述</label>
-                        <textarea
-                            id="category-description"
-                            name="description"
-                            rows="3"
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth focus:border-primary focus:outline-none resize-none"
-                        ></textarea>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button
-                            type="button"
-                            onclick="closeModal('modal-add-category')"
-                            class="px-4 py-2 text-gray-600 text-sm font-medium transition-smooth hover:text-gray-800 cursor-pointer"
-                        >
-                            取消
-                        </button>
-                        <button
-                            type="submit"
-                            class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg transition-smooth hover:bg-secondary cursor-pointer focus-ring"
-                        >
-                            创建分类
-                        </button>
-                    </div>
+                <div class="form-group">
+                    <label for="category-name" class="form-label">分类名称 *</label>
+                    <input type="text" id="category-name" name="name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="category-description" class="form-label">分类描述</label>
+                    <textarea id="category-description" name="description" class="form-textarea" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-add-category')">取消</button>
+                    <button type="submit" class="btn btn-primary btn-sm">创建分类</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Edit Task Modal -->
-    <div id="modal-edit-task" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" role="dialog" aria-modal="true">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-text">编辑任务</h2>
-                <button onclick="closeModal('modal-edit-task')" class="text-gray-400 hover:text-gray-600 cursor-pointer">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 18L18 6M6 6l12 12"/>
+    <div id="modal-edit-task" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">编辑任务</h2>
+                <button class="modal-close" onclick="closeModal('modal-edit-task')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
-
             <form id="form-edit-task" onsubmit="submitEditTask(event)">
                 <input type="hidden" id="edit-task-id" name="id">
-                <div class="space-y-4">
-                    <!-- Title -->
-                    <div>
-                        <label for="edit-task-title" class="block text-sm font-medium text-text mb-1">任务标题 *</label>
-                        <input
-                            type="text"
-                            id="edit-task-title"
-                            name="title"
-                            required
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth focus:border-primary focus:outline-none"
-                        >
-                    </div>
-
-                    <!-- Description -->
-                    <div>
-                        <label for="edit-task-description" class="block text-sm font-medium text-text mb-1">任务描述</label>
-                        <textarea
-                            id="edit-task-description"
-                            name="description"
-                            rows="3"
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth focus:border-primary focus:outline-none resize-none"
-                        ></textarea>
-                    </div>
-
-                    <!-- Category -->
-                    <div>
-                        <label for="edit-task-category" class="block text-sm font-medium text-text mb-1">分类</label>
-                        <select
-                            id="edit-task-category"
-                            name="categoryId"
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth cursor-pointer focus:border-primary focus:outline-none"
-                        >
-                            <option value="">选择分类</option>
-                        </select>
-                    </div>
-
-                    <!-- Priority -->
-                    <div>
-                        <label for="edit-task-priority" class="block text-sm font-medium text-text mb-1">优先级</label>
-                        <select
-                            id="edit-task-priority"
-                            name="priority"
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth cursor-pointer focus:border-primary focus:outline-none"
-                        >
-                            <option value="0">低</option>
-                            <option value="1">中</option>
-                            <option value="2">高</option>
-                        </select>
-                    </div>
-
-                    <!-- Due Date -->
-                    <div>
-                        <label for="edit-task-due-date" class="block text-sm font-medium text-text mb-1">截止日期</label>
-                        <input
-                            type="date"
-                            id="edit-task-due-date"
-                            name="dueDate"
-                            class="w-full px-4 py-2 border border-gray-200 rounded-lg transition-smooth focus:border-primary focus:outline-none"
-                        >
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button
-                            type="button"
-                            onclick="closeModal('modal-edit-task')"
-                            class="px-4 py-2 text-gray-600 text-sm font-medium transition-smooth hover:text-gray-800 cursor-pointer"
-                        >
-                            取消
-                        </button>
-                        <button
-                            type="submit"
-                            class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg transition-smooth hover:bg-secondary cursor-pointer focus-ring"
-                        >
-                            保存修改
-                        </button>
-                    </div>
+                <div class="form-group">
+                    <label for="edit-task-title" class="form-label">任务标题 *</label>
+                    <input type="text" id="edit-task-title" name="title" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-task-description" class="form-label">任务描述</label>
+                    <textarea id="edit-task-description" name="description" class="form-textarea" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-task-category" class="form-label">分类</label>
+                    <select id="edit-task-category" name="categoryId" class="form-select">
+                        <option value="">选择分类</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-task-priority" class="form-label">优先级</label>
+                    <select id="edit-task-priority" name="priority" class="form-select">
+                        <option value="0">低</option>
+                        <option value="1">中</option>
+                        <option value="2">高</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-task-due-date" class="form-label">截止日期</label>
+                    <input type="date" id="edit-task-due-date" name="dueDate" class="form-input">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-edit-task')">取消</button>
+                    <button type="submit" class="btn btn-primary btn-sm">保存修改</button>
                 </div>
             </form>
         </div>
