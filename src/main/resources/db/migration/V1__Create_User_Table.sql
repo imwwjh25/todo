@@ -12,4 +12,4 @@ CREATE TABLE IF NOT EXISTS user (
 -- 插入预置管理员账号
 -- 密码 'admin123' 的 BCrypt 加密值
 INSERT INTO user (username, password, nickname) VALUES
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '管理员');
+('admin', '$2a$10$Rh33cfhhBj66gcekCEljhOn0LvyrxmFcqZ2x1Q.YPEwKt3QvwbIOy', '管理员');

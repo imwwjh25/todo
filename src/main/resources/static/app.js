@@ -339,13 +339,13 @@ function renderRecentTasks(tasks) {
 function getChartColors() {
     const theme = document.documentElement.getAttribute('data-theme');
     return {
-        text: theme === 'dark' ? '#f5f5f7' : '#1d1d1f',
-        muted: theme === 'dark' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)',
-        grid: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-        accent: theme === 'dark' ? '#2997ff' : '#0071e3',
-        success: '#34c759',
-        warning: '#ff9500',
-        danger: '#ff3b30'
+        text: theme === 'dark' ? '#F9FAFB' : '#1F2937',
+        muted: theme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+        grid: theme === 'dark' ? 'rgba(75,85,99,0.3)' : 'rgba(229,231,235,0.5)',
+        accent: theme === 'dark' ? '#818CF8' : '#6366F1',  /* CareerCompassAI 紫色 */
+        success: '#34C759',
+        warning: '#FF9500',
+        danger: '#EF4444'
     };
 }
 
@@ -361,7 +361,7 @@ function renderPriorityChart(data) {
     const priorityColors = {
         2: colors.danger,
         1: colors.warning,
-        0: colors.success
+        0: colors.accent  /* 低优先级使用紫色 */
     };
 
     charts.priority = new Chart(ctx, {
@@ -978,7 +978,7 @@ function renderPriorityStatsChart(data) {
     const priorityColors = {
         2: colors.danger,
         1: colors.warning,
-        0: colors.success
+        0: colors.accent  /* 低优先级使用紫色 */
     };
 
     charts.priorityStats = new Chart(ctx, {

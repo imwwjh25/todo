@@ -5,14 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TodoMaster - 待办事项管理系统</title>
 
-    <!-- Apple SF Pro Font Stack (system fonts) -->
-    <!-- SF Pro is loaded via system font stack for best compatibility -->
-    <style>
-        @font-face {
-            font-family: 'SF Pro Display';
-            src: local('SF Pro Display'), local('SFProDisplay-Regular'), local('-apple-system');
-        }
-    </style>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,8 +20,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['"SF Pro Text"', '"SF Pro Icons"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
-                        display: ['"SF Pro Display"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
                     }
                 }
             }
@@ -35,58 +28,59 @@
     </script>
 
     <style>
-        /* ==================== Apple Store Design System Variables ==================== */
+        /* ==================== CareerCompassAI Design System Variables ==================== */
         :root {
             /* Light Mode (默认) */
-            --bg-primary: #F5F5F7;
+            --bg-primary: #FFFFFF;
             --bg-surface: #FFFFFF;
             --bg-surface-1: #FFFFFF;
-            --bg-surface-2: #F5F5F7;
-            --bg-nav: rgba(255,255,255,0.72);
-            --bg-modal-overlay: rgba(0,0,0,0.3);
-            --bg-input: #FAFAFC;
+            --bg-surface-2: #F9FAFB;
+            --bg-nav: rgba(255,255,255,0.8);
+            --bg-modal-overlay: rgba(0,0,0,0.5);
+            --bg-input: #FFFFFF;
 
-            --text-primary: #1D1D1F;
-            --text-secondary: rgba(0,0,0,0.8);
-            --text-muted: rgba(0,0,0,0.56);
-            --text-link: #0071E3;
+            --text-primary: #1F2937;
+            --text-secondary: rgba(0,0,0,0.6);
+            --text-muted: rgba(0,0,0,0.5);
+            --text-link: #6366F1;
 
-            --accent: #0071E3;
-            --accent-hover: #0077ED;
+            --accent: #6366F1;
+            --accent-hover: #4F46E5;
             --accent-hover-opacity: 0.88;
 
-            --border: rgba(0,0,0,0.1);
-            --border-input: #D2D2D7;
+            --border: rgba(229,231,235,0.8);
+            --border-input: rgba(229,231,235,0.8);
+            --border-strong: #E5E7EB;
             --border-focus: var(--accent);
 
             --success: #34C759;
             --warning: #FF9500;
-            --danger: #FF3B30;
+            --danger: #EF4444;
 
-            /* Apple Store 圆角系统 */
-            --radius-sm: 8px;      /* 输入框 */
-            --radius-md: 18px;     /* 大卡片 */
-            --radius-lg: 18px;     /* 大区块 */
-            --radius-button: 12px; /* 按钮 */
-            --radius-pill: 980px;  /* 标签 */
+            /* CareerCompassAI 圆角系统 */
+            --radius-sm: 9999px;    /* 输入框 - rounded-full */
+            --radius-md: 24px;      /* 卡片 - rounded-3xl */
+            --radius-lg: 24px;      /* 大区块 */
+            --radius-button: 9999px; /* 按钮 - rounded-full */
+            --radius-pill: 9999px;   /* 标签 - rounded-full */
 
-            /* Apple Store 阴影策略 - 默认无阴影 */
+            /* 阴影策略 */
             --shadow-card: none;
-            --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-card-hover: 0 4px 12px rgba(99,102,241,0.1);
             --shadow-modal: 0 8px 32px rgba(0,0,0,0.12);
-            --focus-ring: 0 0 0 3px rgba(0,113,227,0.25);
+            --focus-ring: 0 0 0 3px rgba(99,102,241,0.2);
 
-            /* Apple Store 间距系统 */
+            /* 间距系统 */
             --space-section: 62px;
             --space-card: 12px;
             --space-content: 24px;
 
             /* 导航栏 */
-            --nav-height: 44px;
+            --nav-height: 56px;
 
-            /* Apple Store 字体系统 */
-            --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-text: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            /* CareerCompassAI 字体系统 */
+            --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-text: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             --font-hero: 80px;
             --font-title: 48px;
             --font-section: 24px;
@@ -94,42 +88,44 @@
             --font-nav: 12px;
             --font-small: 14px;
 
-            /* Apple Store 动效 */
+            /* 动效 */
             --transition-standard: cubic-bezier(0.4, 0, 0.6, 1);
             --transition-duration: 0.32s;
+            --transition-hover: 0.3s ease;
         }
 
-        /* Dark Mode - Apple Store 风格 */
+        /* Dark Mode - CareerCompassAI 风格 */
         [data-theme="dark"] {
-            --bg-primary: #000000;
-            --bg-surface: #1D1D1F;
-            --bg-surface-1: #1D1D1F;
-            --bg-surface-2: #000000;
-            --bg-surface-3: #2A2A2D;
-            --bg-nav: rgba(29,29,31,0.72);
-            --bg-modal-overlay: rgba(60,60,67,0.64);
-            --bg-input: #1C1C1E;
+            --bg-primary: #111827;
+            --bg-surface: #1F2937;
+            --bg-surface-1: #1F2937;
+            --bg-surface-2: #374151;
+            --bg-surface-3: #374151;
+            --bg-nav: rgba(31,36,55,0.8);
+            --bg-modal-overlay: rgba(0,0,0,0.7);
+            --bg-input: #374151;
 
-            --text-primary: #F5F5F7;
-            --text-secondary: rgba(255,255,255,0.8);
-            --text-muted: rgba(255,255,255,0.56);
-            --text-link: #2997FF;
+            --text-primary: #F9FAFB;
+            --text-secondary: rgba(255,255,255,0.6);
+            --text-muted: rgba(255,255,255,0.5);
+            --text-link: #818CF8;
 
-            --accent: #2997FF;
-            --accent-hover: #3A9FFF;
+            --accent: #818CF8;
+            --accent-hover: #A78BFA;
 
-            --border: rgba(255,255,255,0.1);
-            --border-input: #333336;
+            --border: rgba(75,85,99,0.8);
+            --border-input: rgba(75,85,99,0.8);
+            --border-strong: #4B5563;
             --border-focus: var(--accent);
 
             --success: #34C759;
             --warning: #FF9500;
-            --danger: #FF3B30;
+            --danger: #EF4444;
 
             --shadow-card: none;
-            --shadow-card-hover: 0 4px 12px rgba(255,255,255,0.08);
-            --shadow-modal: 0 8px 32px rgba(255,255,255,0.12);
-            --focus-ring: 0 0 0 3px rgba(41,151,255,0.25);
+            --shadow-card-hover: 0 4px 12px rgba(129,140,248,0.1);
+            --shadow-modal: 0 8px 32px rgba(0,0,0,0.24);
+            --focus-ring: 0 0 0 3px rgba(129,140,248,0.2);
         }
 
         /* ==================== Base Styles ==================== */
@@ -150,7 +146,7 @@
             transition: background var(--transition-duration) var(--transition-standard), color var(--transition-duration) var(--transition-standard);
         }
 
-        /* ==================== Navigation - Apple Store 风格 ==================== */
+        /* ==================== Navigation - CareerCompassAI 风格 ==================== */
         .nav {
             position: sticky;
             top: 0;
@@ -161,8 +157,8 @@
             padding: 0 48px;
             height: var(--nav-height);
             background: var(--bg-nav);
-            backdrop-filter: saturate(180%) blur(20px);
-            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            backdrop-filter: saturate(180%) blur(12px);
+            -webkit-backdrop-filter: saturate(180%) blur(12px);
             border-bottom: 1px solid var(--border);
             transition: background var(--transition-duration) var(--transition-standard);
         }
@@ -171,10 +167,9 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
-            letter-spacing: -0.28px;
         }
 
         .nav-logo {
@@ -190,15 +185,15 @@
         }
 
         .nav-tab {
-            padding: 6px 14px;
-            font-size: 12px;
-            font-weight: 400;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
             color: var(--text-secondary);
             background: transparent;
             border: none;
-            border-radius: var(--radius-pill);
+            border-radius: 9999px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s;
         }
 
         .nav-tab:hover {
@@ -206,8 +201,8 @@
         }
 
         .nav-tab.active {
-            color: var(--text-primary);
-            background: var(--bg-surface-1);
+            color: white;
+            background: var(--accent);
         }
 
         .nav-actions {
@@ -221,17 +216,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             background: var(--bg-surface-1);
-            border: none;
+            border: 1px solid var(--border);
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.15s;
         }
 
         .theme-toggle:hover {
-            opacity: 0.88;
+            border-color: var(--accent);
         }
 
         .theme-toggle svg {
@@ -240,34 +235,74 @@
             color: var(--text-primary);
         }
 
-        /* ==================== Buttons - Apple Store 风格 ==================== */
+        /* ==================== Buttons - CareerCompassAI 风格 ==================== */
         .btn {
+            position: relative;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 8px 16px;
+            padding: 10px 20px;
             font-family: var(--font-text);
-            font-size: var(--font-small);
-            font-weight: 400;
-            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            border: 1px solid var(--border-strong);
             border-radius: var(--radius-button);
             cursor: pointer;
-            transition: background 0.2s ease;
+            overflow: hidden;
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            transition: border-color 0.2s;
         }
 
         .btn:hover {
-            opacity: var(--accent-hover-opacity);
+            border-color: var(--accent);
+        }
+
+        /* 按钮文字层 */
+        .btn-text {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        /* 按钮hover背景层 */
+        .btn-hover-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--accent);
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: var(--radius-button);
+        }
+
+        .btn-hover-bg svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Hover动画 */
+        .btn:hover .btn-text {
+            transform: translateX(40px);
+            opacity: 0;
+        }
+
+        .btn:hover .btn-hover-bg {
+            opacity: 1;
         }
 
         .btn-primary {
-            background: var(--accent);
-            color: #FFFFFF;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            opacity: 1;
+            background: var(--bg-surface);
+            color: var(--text-primary);
         }
 
         .btn-secondary {
@@ -276,19 +311,28 @@
             border: 1px solid var(--accent);
         }
 
-        .btn-secondary:hover {
-            background: rgba(0,113,227,0.1);
-            opacity: 1;
+        .btn-secondary:hover .btn-hover-bg {
+            background: var(--accent);
         }
 
         .btn-ghost {
             background: var(--bg-surface-1);
             color: var(--text-primary);
+            border-color: transparent;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--accent);
         }
 
         .btn-sm {
-            padding: 6px 12px;
-            font-size: var(--font-small);
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-sm .btn-hover-bg svg {
+            width: 14px;
+            height: 14px;
         }
 
         .btn-icon {
@@ -298,17 +342,38 @@
             border-radius: 50%;
             background: rgba(60,60,67,0.64);
             color: var(--text-muted);
+            border: none;
         }
 
         .btn-icon:hover {
             color: var(--text-primary);
+            background: var(--bg-surface-2);
+        }
+
+        .btn-icon:hover .btn-text {
+            transform: none;
             opacity: 1;
         }
 
-        /* ==================== Cards - Apple Store 风格 ==================== */
+        /* 主要CTA按钮样式 */
+        .btn-cta {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn-cta:hover {
+            border-color: var(--accent-hover);
+        }
+
+        .btn-cta .btn-hover-bg {
+            background: var(--accent-hover);
+        }
+
+        /* ==================== Cards - CareerCompassAI 风格 ==================== */
         .card {
             background: var(--bg-surface-1);
-            border-radius: var(--radius-md);
+            border-radius: 24px;
             padding: 24px;
             border: 1px solid var(--border);
             box-shadow: var(--shadow-card);
@@ -340,13 +405,12 @@
         .stat-value {
             font-family: var(--font-display);
             font-size: 28px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-primary);
-            letter-spacing: -0.28px;
         }
 
         .stat-label {
-            font-size: var(--font-small);
+            font-size: 14px;
             color: var(--text-muted);
             margin-top: 4px;
         }
@@ -357,60 +421,65 @@
             color: var(--accent);
         }
 
-        /* ==================== Forms - Apple Store 风格 ==================== */
+        /* ==================== Forms - CareerCompassAI 风格 ==================== */
         .form-group {
             margin-bottom: 20px;
         }
 
         .form-label {
             display: block;
-            font-size: var(--font-small);
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 500;
             color: var(--text-primary);
-            margin-bottom: 6px;
-            letter-spacing: -0.224px;
+            margin-bottom: 8px;
         }
 
         .form-input,
         .form-select,
         .form-textarea {
             width: 100%;
-            background: var(--bg-input);
+            height: 48px;
+            background: var(--bg-surface);
             color: var(--text-primary);
-            border: 1px solid var(--border-input);
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);  /* 9999px */
             font-family: var(--font-text);
-            font-size: var(--font-body);
+            font-size: 15px;
             outline: none;
-            letter-spacing: -0.374px;
-            transition: border-color 0.15s, box-shadow 0.15s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .form-input:focus,
         .form-select:focus,
         .form-textarea:focus {
-            border-color: var(--border-focus);
+            border-color: var(--accent);
             box-shadow: var(--focus-ring);
         }
 
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
         .form-textarea {
-            min-height: 80px;
+            min-height: 100px;
             resize: vertical;
+            border-radius: 24px;  /* textarea用大圆角 */
+            padding: 14px 16px;
         }
 
         .form-select {
             cursor: pointer;
         }
 
-        /* ==================== Task Item - Apple Store 风格 ==================== */
+        /* ==================== Task Item - CareerCompassAI 风格 ==================== */
         .task-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 16px 20px;
             background: var(--bg-surface-1);
-            border-radius: var(--radius-md);
+            border-radius: 24px;
             border: 1px solid var(--border);
             box-shadow: none;
             transition: box-shadow var(--transition-duration) var(--transition-standard), transform var(--transition-duration) var(--transition-standard);
@@ -459,14 +528,13 @@
         }
 
         .task-title {
-            font-size: var(--font-body);
+            font-size: 16px;
             font-weight: 500;
             color: var(--text-primary);
-            letter-spacing: -0.374px;
         }
 
         .task-description {
-            font-size: var(--font-small);
+            font-size: 14px;
             color: var(--text-muted);
             margin-top: 4px;
         }
@@ -481,15 +549,15 @@
         .task-tag {
             display: inline-flex;
             align-items: center;
-            padding: 4px 10px;
-            font-size: var(--font-nav);
+            padding: 4px 12px;
+            font-size: 12px;
             font-weight: 500;
-            border-radius: var(--radius-pill);
+            border-radius: 9999px;
         }
 
-        .task-priority-high { background: rgba(255,59,48,0.12); color: var(--danger); }
+        .task-priority-high { background: rgba(239,68,68,0.12); color: var(--danger); }
         .task-priority-medium { background: rgba(255,149,0,0.12); color: var(--warning); }
-        .task-priority-low { background: rgba(52,199,89,0.12); color: var(--success); }
+        .task-priority-low { background: rgba(99,102,241,0.12); color: var(--accent); }
 
         .task-category {
             background: var(--bg-surface-2);
@@ -497,15 +565,15 @@
         }
 
         .task-due {
-            font-size: var(--font-nav);
+            font-size: 12px;
             color: var(--text-muted);
         }
 
         .task-status {
             padding: 4px 12px;
-            font-size: var(--font-nav);
+            font-size: 12px;
             font-weight: 500;
-            border-radius: var(--radius-pill);
+            border-radius: 9999px;
         }
 
         .task-status-completed { background: rgba(52,199,89,0.12); color: var(--success); }
@@ -554,7 +622,7 @@
             font-size: 15px;
         }
 
-        /* ==================== Modal - Apple Store 风格 ==================== */
+        /* ==================== Modal - CareerCompassAI 风格 ==================== */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -575,30 +643,31 @@
 
         .modal-content {
             background: var(--bg-surface);
-            border-radius: var(--radius-md);
-            padding: 24px;
+            border-radius: 24px;
+            padding: 28px;
             width: 100%;
             max-width: 480px;
             margin: 20px;
             box-shadow: var(--shadow-modal);
+            border: 1px solid var(--border);
         }
 
         .modal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .modal-title {
-            font-size: 21px;
+            font-size: 22px;
             font-weight: 600;
             color: var(--text-primary);
         }
 
         .modal-close {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -619,10 +688,10 @@
             display: flex;
             justify-content: flex-end;
             gap: 12px;
-            margin-top: 24px;
+            margin-top: 28px;
         }
 
-        /* ==================== Pagination - Apple Store 风格 ==================== */
+        /* ==================== Pagination - CareerCompassAI 风格 ==================== */
         .pagination {
             display: flex;
             justify-content: center;
@@ -631,15 +700,15 @@
         }
 
         .page-btn {
-            padding: 8px 16px;
-            font-size: var(--font-small);
-            font-weight: 400;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 500;
             color: var(--text-secondary);
             background: var(--bg-surface-1);
             border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
+            border-radius: 9999px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s;
         }
 
         .page-btn:hover:not(:disabled) {
@@ -658,18 +727,17 @@
             cursor: not-allowed;
         }
 
-        /* ==================== Section Styles - Apple Store 风格 ==================== */
+        /* ==================== Section Styles - CareerCompassAI 风格 ==================== */
         .section-title {
             font-family: var(--font-display);
-            font-size: var(--font-section);
+            font-size: 24px;
             font-weight: 600;
             color: var(--text-primary);
-            letter-spacing: -0.28px;
             margin-bottom: 20px;
         }
 
         .section-label {
-            font-size: var(--font-nav);
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
@@ -677,14 +745,14 @@
             margin-bottom: 8px;
         }
 
-        /* ==================== Filter Bar - Apple Store 风格 ==================== */
+        /* ==================== Filter Bar - CareerCompassAI 风格 ==================== */
         .filter-bar {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 16px 20px;
             background: var(--bg-surface-1);
-            border-radius: var(--radius-md);
+            border-radius: 24px;
             border: 1px solid var(--border);
             margin-bottom: 16px;
         }
@@ -698,11 +766,11 @@
             min-width: 120px;
         }
 
-        /* ==================== Category Card - Apple Store 风格 ==================== */
+        /* ==================== Category Card - CareerCompassAI 风格 ==================== */
         .category-card {
             padding: 20px;
             background: var(--bg-surface-1);
-            border-radius: var(--radius-md);
+            border-radius: 24px;
             border: 1px solid var(--border);
             box-shadow: none;
             transition: box-shadow var(--transition-duration) var(--transition-standard), transform var(--transition-duration) var(--transition-standard);
@@ -714,41 +782,41 @@
         }
 
         .category-name {
-            font-size: var(--font-body);
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
         }
 
         .category-desc {
-            font-size: var(--font-small);
+            font-size: 14px;
             color: var(--text-muted);
             margin-top: 4px;
         }
 
         .category-count {
-            font-size: var(--font-nav);
+            font-size: 12px;
             color: var(--text-muted);
             margin-top: 12px;
         }
 
-        /* ==================== Statistics Styles - Apple Store 风格 ==================== */
+        /* ==================== Statistics Styles - CareerCompassAI 风格 ==================== */
         .stat-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 16px 20px;
             background: var(--bg-surface-1);
-            border-radius: var(--radius-md);
+            border-radius: 24px;
             border: 1px solid var(--border);
         }
 
         .stat-item-label {
-            font-size: var(--font-small);
+            font-size: 14px;
             color: var(--text-muted);
         }
 
         .stat-item-value {
-            font-size: var(--font-body);
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
         }
@@ -765,16 +833,16 @@
             50% { opacity: 0.5; }
         }
 
-        /* ==================== Chart Container - Apple Store 风格 ==================== */
+        /* ==================== Chart Container - CareerCompassAI 风格 ==================== */
         .chart-container {
             background: var(--bg-surface-1);
-            border-radius: var(--radius-md);
+            border-radius: 24px;
             padding: 24px;
             border: 1px solid var(--border);
         }
 
         .chart-title {
-            font-size: var(--font-body);
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 16px;
@@ -903,18 +971,37 @@
                 </svg>
             </button>
             <button id="logout-btn" class="btn btn-ghost btn-sm" onclick="handleLogout()" aria-label="退出登录">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-                    <polyline points="16 17 21 12 16 7"/>
-                    <line x1="21" y1="12" x2="9" y2="12"/>
-                </svg>
-                <span>退出</span>
+                <span class="btn-text">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    退出
+                </span>
+                <div class="btn-hover-bg">
+                    <span>退出</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </div>
             </button>
             <button class="btn btn-primary btn-sm" onclick="openAddTaskModal()" aria-label="快速添加任务">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12h14"/>
-                </svg>
-                <span>添加任务</span>
+                <span class="btn-text">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    添加任务
+                </span>
+                <div class="btn-hover-bg">
+                    <span>添加任务</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14"/>
+                        <path d="m12 5 7 7-7 7"/>
+                    </svg>
+                </div>
             </button>
         </div>
     </nav>
@@ -1032,10 +1119,19 @@
         <section id="view-categories" class="view-section hidden" role="tabpanel" aria-labelledby="tab-categories">
             <div style="margin-bottom:16px">
                 <button class="btn btn-secondary btn-sm" onclick="openAddCategoryModal()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 5v14M5 12h14"/>
-                    </svg>
-                    <span>新建分类</span>
+                    <span class="btn-text">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        新建分类
+                    </span>
+                    <div class="btn-hover-bg">
+                        <span>新建分类</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14"/>
+                            <path d="m12 5 7 7-7 7"/>
+                        </svg>
+                    </div>
                 </button>
             </div>
 
@@ -1052,7 +1148,16 @@
                 <label style="font-size:14px; font-weight:500; color:var(--text-primary)">日期范围:</label>
                 <input type="date" id="date-start" class="form-input" style="max-width:160px">
                 <input type="date" id="date-end" class="form-input" style="max-width:160px">
-                <button class="btn btn-primary btn-sm" onclick="loadStatistics()">查询</button>
+                <button class="btn btn-primary btn-sm" onclick="loadStatistics()">
+                    <span class="btn-text">查询</span>
+                    <div class="btn-hover-bg">
+                        <span>查询</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14"/>
+                            <path d="m12 5 7 7-7 7"/>
+                        </svg>
+                    </div>
+                </button>
             </div>
 
             <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:16px">
@@ -1125,8 +1230,19 @@
                     <input type="date" id="task-due-date" name="dueDate" class="form-input">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-add-task')">取消</button>
-                    <button type="submit" class="btn btn-primary btn-sm">创建任务</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-add-task')">
+                        <span class="btn-text">取消</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="btn-text">创建任务</span>
+                        <div class="btn-hover-bg">
+                            <span>创建任务</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14"/>
+                                <path d="m12 5 7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </button>
                 </div>
             </form>
         </div>
@@ -1153,8 +1269,19 @@
                     <textarea id="category-description" name="description" class="form-textarea" rows="3"></textarea>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-add-category')">取消</button>
-                    <button type="submit" class="btn btn-primary btn-sm">创建分类</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-add-category')">
+                        <span class="btn-text">取消</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="btn-text">创建分类</span>
+                        <div class="btn-hover-bg">
+                            <span>创建分类</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14"/>
+                                <path d="m12 5 7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </button>
                 </div>
             </form>
         </div>
@@ -1200,8 +1327,19 @@
                     <input type="date" id="edit-task-due-date" name="dueDate" class="form-input">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-edit-task')">取消</button>
-                    <button type="submit" class="btn btn-primary btn-sm">保存修改</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('modal-edit-task')">
+                        <span class="btn-text">取消</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span class="btn-text">保存修改</span>
+                        <div class="btn-hover-bg">
+                            <span>保存修改</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14"/>
+                                <path d="m12 5 7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </button>
                 </div>
             </form>
         </div>
